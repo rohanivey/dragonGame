@@ -44,6 +44,7 @@ public class Player extends Entity{
 	
 	public Player(int inputX, int inputY, MainState inputMainState)
 	{
+		super(inputX, inputY);
 		location = new Vector2(inputX, inputY);
 		ms = inputMainState;
 		img = new Texture("animations/player.png");
@@ -88,7 +89,7 @@ public class Player extends Entity{
 		
 		boundingRectangle = new Rectangle();
 		interactCircleLocation = new Vector2(location);
-		interactCircle = new Circle(interactCircleLocation.x, interactCircleLocation.y, 3);
+		interactCircle = new Circle(interactCircleLocation.x, interactCircleLocation.y, 1);
 		interactTimer = 0f;
 		
 	}
@@ -108,9 +109,9 @@ public class Player extends Entity{
 	
 	public void interact()
 	{
-		if(Gdx.input.isKeyPressed(Keys.E))
+		if(interactTimer <= 0)
 		{
-			if(interactTimer <= 0)
+			if(Gdx.input.isKeyPressed(Keys.E))
 			{
 				interactTimer = 1f;
 				interactCircle.setPosition(interactCircleLocation);
@@ -120,7 +121,7 @@ public class Player extends Entity{
 		else
 		{
 			interactCircleLocation.set(location);
-			interactCircle.setPosition(location);
+			interactCircle.setPosition(interactCircleLocation);
 			interactTimer-= ms.getGSM().getDeltaTime();
 		}
 	} 
@@ -182,7 +183,8 @@ public class Player extends Entity{
 		if(location.y > mapHeight - currentFrame.getRegionHeight()){location.y = mapHeight - currentFrame.getRegionHeight();}
 	}
 	
-	public TextureRegion getTexture(){ return currentFrame; }
+	public Texture getTexture(){return null;}
+	public TextureRegion getTextureRegion(){ return currentFrame; }
 	public TextureRegion getFrame()
 	{
 		return currentFrame;
@@ -198,6 +200,8 @@ public class Player extends Entity{
 	
 	public Rectangle getCollision(){return boundingRectangle;}
 	public Circle getInteraction(){return interactCircle;}
+
+	
 	
 	
 }

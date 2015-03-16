@@ -32,6 +32,8 @@ public class MainState extends GameState{
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private Music carnivalMusic;
 	
+	private Dog testDog;
+	
 	
 	private ArrayList<Entity> critters;
 	
@@ -57,17 +59,20 @@ public class MainState extends GameState{
 		carnivalMusic.setLooping(true);
 		
 		player = new Player(30, 30, ms);
-		
-		
-		//Box 2d stuff
-		addEntity(player);
-		
+		addEntity(testDog = new Dog(30, 30));
+
 		System.out.println("MainState initialized");
 	}
 	
 	public void update()
 	{
-		for(int i = 0; i < critters.size(); i++){critters.get(i).update();}
+		player.update();
+		for(int i = 0; i < critters.size(); i++)
+		{
+			critters.get(i).handleCollision(player);
+			critters.get(i).handleInteraction(player);
+			critters.get(i).update();
+		}
 		cameraHandler();
 		//System.out.println("MainState updated");
 		
@@ -80,7 +85,7 @@ public class MainState extends GameState{
 	
 	public void cameraHandler()
 	{
-		cam.position.set(player.getX() + player.getTexture().getRegionWidth()/2, player.getY() + player.getTexture().getRegionHeight()/2, 0);
+		cam.position.set(player.getX() + player.getTextureRegion().getRegionWidth()/2, player.getY() + player.getTextureRegion().getRegionHeight()/2, 0);
 		if(cam.position.x < 0 + cam.viewportWidth/2){cam.position.x = cam.viewportWidth/2; }
 		if(cam.position.x > (level.get(0).getProperties().get("width", Integer.class) * level.get(0).getProperties().get("tilewidth", Integer.class)) - cam.viewportWidth/2){cam.position.x = (level.get(0).getProperties().get("width", Integer.class) * level.get(0).getProperties().get("tilewidth", Integer.class)) - cam.viewportWidth/2;}
 		if(cam.position.y < 0 + cam.viewportHeight/2){cam.position.y = cam.viewportHeight/2; }
@@ -101,6 +106,7 @@ public class MainState extends GameState{
 		//sb.draw(player.getTexture(), player.getX() - player.getTexture().getWidth()/2, player.getY() - player.getTexture().getWidth()/2);
 		//sb.draw(player.getFrame(), player.getX() - player.getTexture().getRegionWidth()/2, player.getY() - player.getTexture().getRegionHeight()/2);
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
+		for(Entity e: critters){sb.draw(e.getTexture(), e.getX(), e.getY());}
 		Texture t;
 		sb.draw(t = new Texture("badlogic.jpg"), player.getInteraction().x, player.getInteraction().y, player.getInteraction().area(), player.getInteraction().area());
 		sb.end();
