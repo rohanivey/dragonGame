@@ -6,9 +6,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Player {
+public class Player extends Entity{
 
 	private Vector2 location;
 	private Texture img;
@@ -21,7 +23,6 @@ public class Player {
 	private Animation walkRight;
 	private Animation walkUp;
 	private Animation walkDown;
-	
 	State state = State.Down;
 	float stateTime;
 	TextureRegion[] animationFrames;
@@ -31,7 +32,11 @@ public class Player {
 	//Vertical
 	private static final int FRAME_ROWS = 4;
 	
-	
+	private Rectangle boundingRectangle;
+	private Circle interactCircle;
+	private Vector2 interactCircleLocation;
+	private float interactTimer;
+
 	enum State 
 	{
 		Left, Right, Up, Down
@@ -79,41 +84,78 @@ public class Player {
 		stateTime = 0f;
 		loadMap();
 		currentFrame = walkDown.getKeyFrame(stateTime, true);
+		
+		
+		boundingRectangle = new Rectangle();
+		interactCircleLocation = new Vector2(location);
+		interactCircle = new Circle(interactCircleLocation.x, interactCircleLocation.y, 3);
+		interactTimer = 0f;
+		
 	}
 
 	public void update()
 	{ 
 		handleInput();
+		handleCollision();
 		handleAnimation();
 		screenEdging();
 	}
 	
+	public void handleCollision()
+	{
+		boundingRectangle.set(location.x, location.y, currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
+	}
+	
+	public void interact()
+	{
+		if(Gdx.input.isKeyPressed(Keys.E))
+		{
+			if(interactTimer <= 0)
+			{
+				interactTimer = 1f;
+				interactCircle.setPosition(interactCircleLocation);
+				System.out.println("Circle created at " + interactCircle.x + "," + interactCircle.y);
+			}
+		}
+		else
+		{
+			interactCircleLocation.set(location);
+			interactCircle.setPosition(location);
+			interactTimer-= ms.getGSM().getDeltaTime();
+		}
+	} 
+	
 	public void handleAnimation()
 	{
-		stateTime += Gdx.graphics.getDeltaTime();
+		stateTime += ms.getGSM().getDeltaTime();
 		switch(state)
 		{
 		case Left:
 			//System.out.println("State is left");
 			currentFrame = walkLeft.getKeyFrame(stateTime,true);
+			interactCircleLocation.set(location.x - currentFrame.getRegionWidth()/2, location.y);
 			break;
 		case Right:
 			//System.out.println("State is right");
 			currentFrame = walkRight.getKeyFrame(stateTime,true);
+			interactCircleLocation.set(location.x + currentFrame.getRegionWidth()/2, location.y);
 			break;
 		case Up:
 			//System.out.println("State is up");
 			currentFrame = walkUp.getKeyFrame(stateTime,true);
+			interactCircleLocation.set(location.x, location.y + currentFrame.getRegionHeight()/2);
 			break;
 		case Down:
 			//System.out.println("State is down");
 			currentFrame = walkDown.getKeyFrame(stateTime,true);
+			interactCircleLocation.set(location.x, location.y - currentFrame.getRegionHeight()/2);
 			break;
 		}
 	}
 	
 	public void handleInput()
 	{
+		interact();
 		if(Gdx.input.isKeyPressed(Keys.W)){ location.y += 40 ; state = State.Up;}
 		else if(Gdx.input.isKeyPressed(Keys.S)){ location.y -=40 ; state = State.Down;}
 		else if(Gdx.input.isKeyPressed(Keys.D)){ location.x += 40 ; state = State.Right;}
@@ -137,7 +179,7 @@ public class Player {
 		if(location.x < 4){location.x = 4; }
 		if(location.x > mapWidth - currentFrame.getRegionWidth()){location.x = mapWidth - currentFrame.getRegionWidth();}
 		if(location.y < 4){location.y = 4; }
-		if(location.y > mapHeight - currentFrame.getRegionHeight()){location.y = mapHeight - currentFrame.getRegionHeight();}
+		if(location.y > mapHeight - currentFrame.getRegionHeight()/2){location.y = mapHeight - currentFrame.getRegionHeight()/2;}
 	}
 	
 	public TextureRegion getTexture(){ return currentFrame; }
@@ -153,5 +195,9 @@ public class Player {
 	{
 		img.dispose();
 	}
+	
+	public Rectangle getCollision(){return boundingRectangle;}
+	public Circle getInteraction(){return interactCircle;}
+	
 	
 }

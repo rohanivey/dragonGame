@@ -18,12 +18,15 @@ public class GameStateManager {
 	private float frames;
 	private float totalTime;
 	
+	private float dt;
+	
 	public GameStateManager()
 	{
 		gsm = this;
 		
 		frames = 60;
 		ticks = 1/frames;
+
 		
 		gsList = new ArrayList<GameState>();
 		menu = new MenuState(gsm);
@@ -41,7 +44,8 @@ public class GameStateManager {
 	
 	public void update()
 	{
-		totalTime += Gdx.graphics.getDeltaTime();
+		dt = Gdx.graphics.getDeltaTime();
+		totalTime += dt;
 		if(totalTime >= ticks)
 		{
 			gsList.get(currentState).update();
@@ -78,6 +82,8 @@ public class GameStateManager {
 	}
 	
 	public int getCurrentState() {return currentState;}
+	
+	public float getDeltaTime(){ return dt;}
 	
 	
 }
