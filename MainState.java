@@ -100,7 +100,7 @@ public class MainState extends GameState{
 		sb.begin();
 		//sb.draw(player.getTexture(), player.getX() - player.getTexture().getWidth()/2, player.getY() - player.getTexture().getWidth()/2);
 		//sb.draw(player.getFrame(), player.getX() - player.getTexture().getRegionWidth()/2, player.getY() - player.getTexture().getRegionHeight()/2);
-		sb.draw(player.getFrame(), player.getX(), player.getY());
+		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
 		Texture t;
 		sb.draw(t = new Texture("badlogic.jpg"), player.getInteraction().x, player.getInteraction().y, player.getInteraction().area(), player.getInteraction().area());
 		sb.end();

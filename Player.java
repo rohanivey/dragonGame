@@ -176,10 +176,10 @@ public class Player extends Entity{
 	
 	public void screenEdging()
 	{
-		if(location.x < 4){location.x = 4; }
-		if(location.x > mapWidth - currentFrame.getRegionWidth()){location.x = mapWidth - currentFrame.getRegionWidth();}
-		if(location.y < 4){location.y = 4; }
-		if(location.y > mapHeight - currentFrame.getRegionHeight()/2){location.y = mapHeight - currentFrame.getRegionHeight()/2;}
+		if(location.x < currentFrame.getRegionWidth()/4){location.x = currentFrame.getRegionWidth()/4; }
+		if(location.x > mapWidth - currentFrame.getRegionWidth()/4){location.x = mapWidth - currentFrame.getRegionWidth()/4;}
+		if(location.y < 0){location.y = 0;}
+		if(location.y > mapHeight - currentFrame.getRegionHeight()){location.y = mapHeight - currentFrame.getRegionHeight();}
 	}
 	
 	public TextureRegion getTexture(){ return currentFrame; }
