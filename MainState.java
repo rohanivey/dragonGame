@@ -4,15 +4,13 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
@@ -29,10 +27,16 @@ public class MainState extends GameState{
 	private SpriteBatch hud;
 	private BitmapFont hudFont;
 	private TiledMap map;
+	TiledMapTileLayer bg;
+	TiledMapTileLayer fg;
+	TiledMapTileLayer oj;
+	TiledMapTileLayer oh;
+	int[] backgroundLayers;
+	int[] overheadLayers;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private Music carnivalMusic;
 	
-	private Dog testDog;
+	
 	
 	
 	private ArrayList<Entity> critters;
@@ -50,17 +54,24 @@ public class MainState extends GameState{
 		critters = new ArrayList<Entity>();
 		
 		level = new ArrayList<TiledMap>();
-		map = new TmxMapLoader().load("firstMap.tmx");
+		//map = new TmxMapLoader().load("firstMap.tmx");
+		map = areaLoad("firstMap.tmx");
 		level.add(map);
 		//Render the map created above at 1/16th scale
-		mapRenderer = new OrthogonalTiledMapRenderer(map);
+		mapRenderer = new OrthogonalTiledMapRenderer(level.get(0),sb);
+		
+		//Music
 		carnivalMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/carnivalrides.ogg"));
 		carnivalMusic.setVolume(0.4f);
 		carnivalMusic.setLooping(true);
 		
 		player = new Player(30, 30, ms);
+		Entity testDog;
 		addEntity(testDog = new Dog(30, 30));
 
+		//Map stuff
+
+		
 		System.out.println("MainState initialized");
 	}
 	
@@ -78,7 +89,30 @@ public class MainState extends GameState{
 		
 	}
 	
-	public void worldUpdate(){}
+	public TiledMap areaLoad(String inputString)
+	{
+		return makeTileMap(inputString);
+		
+	}
+	
+	public TiledMap makeTileMap(String inputString)
+	{
+		TiledMap tileMap = new TmxMapLoader().load(inputString);
+		
+		bg = (TiledMapTileLayer)tileMap.getLayers().get("Background");
+		fg = (TiledMapTileLayer)tileMap.getLayers().get("Foreground");
+		oj = (TiledMapTileLayer)tileMap.getLayers().get("Objects");
+		oh = (TiledMapTileLayer)tileMap.getLayers().get("Overhead");
+		
+		int[] backgroundLayers = {0};
+		int[] overheadLayers = {1};
+		return tileMap;
+	}
+	
+	public void createLayer(TiledMapTileLayer inputLayer)
+	{
+		
+	}
 	
 	public void startMusic(){carnivalMusic.play();}
 	public void stopMusic(){carnivalMusic.stop();}
@@ -98,18 +132,24 @@ public class MainState extends GameState{
 		//System.out.println("Mainstate drawn");
 		
 		mapRenderer.setView(cam);
-		mapRenderer.render();
+		//mapRenderer.render(backgroundLayers);
+	
 		
 		sb.setProjectionMatrix(cam.combined);
 		
 		sb.begin();
+		mapRenderer.renderTileLayer(bg);
+		mapRenderer.renderTileLayer(fg);
+		mapRenderer.renderTileLayer(oj);
 		//sb.draw(player.getTexture(), player.getX() - player.getTexture().getWidth()/2, player.getY() - player.getTexture().getWidth()/2);
 		//sb.draw(player.getFrame(), player.getX() - player.getTexture().getRegionWidth()/2, player.getY() - player.getTexture().getRegionHeight()/2);
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
 		for(Entity e: critters){sb.draw(e.getTexture(), e.getX(), e.getY());}
-		Texture t;
-		sb.draw(t = new Texture("badlogic.jpg"), player.getInteraction().x, player.getInteraction().y, player.getInteraction().area(), player.getInteraction().area());
+		mapRenderer.renderTileLayer(oh);
 		sb.end();
+		
+		//mapRenderer.render(overheadLayers);
+
 		
 		hud.setProjectionMatrix(hudCam.combined);
 		hud.begin();
