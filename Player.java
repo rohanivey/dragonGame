@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -38,6 +39,8 @@ public class Player{
 	private Circle interactCircle;
 	private Vector2 interactCircleLocation;
 	private float interactTimer;
+	
+	private int speed;
 
 	enum State 
 	{
@@ -94,6 +97,8 @@ public class Player{
 		interactCircleLocation = new Vector2(location);
 		interactCircle = new Circle(interactCircleLocation.x, interactCircleLocation.y, 1);
 		interactTimer = 0f;
+		
+		speed = 4;
 		
 	}
 
@@ -159,10 +164,77 @@ public class Player{
 	public void handleInput()
 	{
 		interact();
-		if(Gdx.input.isKeyPressed(Keys.W)){ location.y += 40 ; state = State.Up;}
-		else if(Gdx.input.isKeyPressed(Keys.S)){ location.y -=4 ; state = State.Down;}
-		else if(Gdx.input.isKeyPressed(Keys.D)){ location.x += 40 ; state = State.Right;}
-		else if(Gdx.input.isKeyPressed(Keys.A)){ location.x -= 4 ; state = State.Left;}
+		checkMovement();
+	}
+	
+	public void checkMovement()
+	{
+		
+		Rectangle tempCollision;
+		if(Gdx.input.isKeyPressed(Keys.W))
+		{
+			state = State.Up;
+			for(Entity e: ms.getCritters())
+			{
+				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y + speed, this.getCollision().width, this.getCollision().height);
+				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				{
+					location.y += speed ; 
+				}
+				else
+				{
+					e.handleCollision(this);
+				}
+			}
+		}
+		else if(Gdx.input.isKeyPressed(Keys.S))
+		{
+			state = State.Down;
+			for(Entity e: ms.getCritters())
+			{
+				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y - speed, this.getCollision().width, this.getCollision().height);
+				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				{
+					location.y -= speed ; 
+				}
+				else
+				{
+					e.handleCollision(this);
+				}
+			}
+		}
+		else if(Gdx.input.isKeyPressed(Keys.A))
+		{
+			state = State.Left;
+			for(Entity e: ms.getCritters())
+			{
+				tempCollision = new Rectangle(this.getCollision().x - speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
+				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				{
+					location.x -= speed ; 
+				}
+				else
+				{
+					e.handleCollision(this);
+				}
+			}
+		}
+		else if(Gdx.input.isKeyPressed(Keys.D))
+		{
+			state = State.Right;
+			for(Entity e: ms.getCritters())
+			{
+				tempCollision = new Rectangle(this.getCollision().x + speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
+				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				{
+					location.x += speed ; 
+				}
+				else
+				{
+					e.handleCollision(this);
+				}
+			}
+		}
 	}
 	
 	public void loadMap()

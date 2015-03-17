@@ -80,12 +80,6 @@ public class MainState extends GameState{
 	public void update()
 	{
 		player.update();
-		for(int i = 0; i < critters.size(); i++)
-		{
-			critters.get(i).handleCollision(player);
-			critters.get(i).handleInteraction(player);
-			critters.get(i).update();
-		}
 		cameraHandler();
 		//System.out.println("MainState updated");
 		
@@ -143,6 +137,7 @@ public class MainState extends GameState{
 		sb.setProjectionMatrix(cam.combined);
 		
 		sb.begin();
+		
 		mapRenderer.renderTileLayer(bg);
 		mapRenderer.renderTileLayer(fg);
 		mapRenderer.renderTileLayer(oj);
@@ -155,6 +150,7 @@ public class MainState extends GameState{
 		
 		sr.setProjectionMatrix(cam.combined);
 		
+		/*
 		sr.begin(ShapeType.Filled);
 		sr.setColor(Color.RED);
 		sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
@@ -162,7 +158,8 @@ public class MainState extends GameState{
 		for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
 		sr.setColor(Color.BLACK);
 		sr.circle(player.getInteraction().x, player.getInteraction().y, player.getInteraction().radius);
-		sr.end();		
+		sr.end();
+		*/		
 		
 		hud.setProjectionMatrix(hudCam.combined);
 		hud.begin();
@@ -187,5 +184,6 @@ public class MainState extends GameState{
 	public MapProperties getCurrentMapProperties(){ return level.get(0).getProperties();}
 	public GameStateManager getGSM(){return gsm;}
 	public void stopPlayer(){player.fullStop();}
+	public ArrayList<Entity> getCritters(){return critters;}
 	
 }
