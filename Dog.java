@@ -2,16 +2,17 @@ package com.rohan.dragonGame;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 
 
 public class Dog extends Entity{
 
-	Texture img = new Texture("badlogic.jpg");
+	Texture img = new Texture("dog.png");
+
 	
-	Dog(int inputX, int inputY) {
-		super(inputX, inputY);
+	Dog(int inputX, int inputY, Player inputPlayer) {
+		super(inputX, inputY, inputPlayer);
 		setCollision(img);
+		type = Type.Neutral;
 	}
 	
 	public Texture Draw(){return img;}
@@ -20,6 +21,8 @@ public class Dog extends Entity{
 	public Texture getTexture() {
 		return img;
 	}
+	
+
 
 	@Override
 	public TextureRegion getTextureRegion() {

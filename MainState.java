@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -27,15 +29,17 @@ public class MainState extends GameState{
 	private SpriteBatch hud;
 	private BitmapFont hudFont;
 	private TiledMap map;
-	TiledMapTileLayer bg;
-	TiledMapTileLayer fg;
-	TiledMapTileLayer oj;
-	TiledMapTileLayer oh;
+	private TiledMapTileLayer bg;
+	private TiledMapTileLayer fg;
+	private TiledMapTileLayer oj;
+	private TiledMapTileLayer oh;
 	int[] backgroundLayers;
 	int[] overheadLayers;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private Music carnivalMusic;
 	
+	
+	private ShapeRenderer sr;
 	
 	
 	
@@ -54,11 +58,9 @@ public class MainState extends GameState{
 		critters = new ArrayList<Entity>();
 		
 		level = new ArrayList<TiledMap>();
-		//map = new TmxMapLoader().load("firstMap.tmx");
-		map = areaLoad("firstMap.tmx");
-		level.add(map);
+		areaLoad("firstMap.tmx");
 		//Render the map created above at 1/16th scale
-		mapRenderer = new OrthogonalTiledMapRenderer(level.get(0),sb);
+		
 		
 		//Music
 		carnivalMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/carnivalrides.ogg"));
@@ -67,11 +69,11 @@ public class MainState extends GameState{
 		
 		player = new Player(30, 30, ms);
 		Entity testDog;
-		addEntity(testDog = new Dog(30, 30));
-
-		//Map stuff
+		addEntity(testDog = new Dog(90, 90, player));
 
 		
+		//Debug things
+		sr = new ShapeRenderer();
 		System.out.println("MainState initialized");
 	}
 	
@@ -89,9 +91,13 @@ public class MainState extends GameState{
 		
 	}
 	
-	public TiledMap areaLoad(String inputString)
+	public void areaLoad(String inputString)
 	{
-		return makeTileMap(inputString);
+		map = makeTileMap(inputString);
+		level.add(map);
+		mapRenderer = new OrthogonalTiledMapRenderer(level.get(0),sb);
+		if(level.size() > 1){level.remove(1);}
+		
 		
 	}
 	
@@ -129,11 +135,10 @@ public class MainState extends GameState{
 	
 	public void draw()
 	{
-		//System.out.println("Mainstate drawn");
 		
 		mapRenderer.setView(cam);
-		//mapRenderer.render(backgroundLayers);
-	
+		
+
 		
 		sb.setProjectionMatrix(cam.combined);
 		
@@ -148,8 +153,16 @@ public class MainState extends GameState{
 		mapRenderer.renderTileLayer(oh);
 		sb.end();
 		
-		//mapRenderer.render(overheadLayers);
-
+		sr.setProjectionMatrix(cam.combined);
+		
+		sr.begin(ShapeType.Filled);
+		sr.setColor(Color.RED);
+		sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
+		sr.setColor(Color.BLUE);
+		for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
+		sr.setColor(Color.BLACK);
+		sr.circle(player.getInteraction().x, player.getInteraction().y, player.getInteraction().radius);
+		sr.end();		
 		
 		hud.setProjectionMatrix(hudCam.combined);
 		hud.begin();
@@ -173,5 +186,6 @@ public class MainState extends GameState{
 	
 	public MapProperties getCurrentMapProperties(){ return level.get(0).getProperties();}
 	public GameStateManager getGSM(){return gsm;}
+	public void stopPlayer(){player.fullStop();}
 	
 }

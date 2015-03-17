@@ -10,9 +10,11 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Player extends Entity{
+public class Player{
 
 	private Vector2 location;
+	private Vector2 previousLocation;
+	private Vector2 tempLocation;
 	private Texture img;
 	private MainState ms;
 	private MapProperties mapProperties;
@@ -44,8 +46,9 @@ public class Player extends Entity{
 	
 	public Player(int inputX, int inputY, MainState inputMainState)
 	{
-		super(inputX, inputY);
+		
 		location = new Vector2(inputX, inputY);
+		previousLocation = location;
 		ms = inputMainState;
 		img = new Texture("animations/player.png");
 		TextureRegion[][] tempFrames = TextureRegion.split(img, img.getWidth()/FRAME_COLS, img.getHeight()/FRAME_ROWS);
@@ -104,11 +107,16 @@ public class Player extends Entity{
 	
 	public void handleCollision()
 	{
-		boundingRectangle.set(location.x, location.y, currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
+		previousLocation = tempLocation;
+		tempLocation = location;
+		boundingRectangle.set(location.x - currentFrame.getRegionWidth()/4, location.y, currentFrame.getRegionWidth()/2, currentFrame.getRegionHeight());
 	}
 	
 	public void interact()
 	{
+		interactCircle.setPosition(location);
+		interactTimer -= ms.getGSM().getDeltaTime();
+		
 		if(interactTimer <= 0)
 		{
 			if(Gdx.input.isKeyPressed(Keys.E))
@@ -117,12 +125,6 @@ public class Player extends Entity{
 				interactCircle.setPosition(interactCircleLocation);
 				System.out.println("Circle created at " + interactCircle.x + "," + interactCircle.y);
 			}
-		}
-		else
-		{
-			interactCircleLocation.set(location);
-			interactCircle.setPosition(interactCircleLocation);
-			interactTimer-= ms.getGSM().getDeltaTime();
 		}
 	} 
 	
@@ -134,12 +136,12 @@ public class Player extends Entity{
 		case Left:
 			//System.out.println("State is left");
 			currentFrame = walkLeft.getKeyFrame(stateTime,true);
-			interactCircleLocation.set(location.x - currentFrame.getRegionWidth()/2, location.y);
+			interactCircleLocation.set(location.x - currentFrame.getRegionWidth()/3, location.y + currentFrame.getRegionHeight()/4);
 			break;
 		case Right:
 			//System.out.println("State is right");
 			currentFrame = walkRight.getKeyFrame(stateTime,true);
-			interactCircleLocation.set(location.x + currentFrame.getRegionWidth()/2, location.y);
+			interactCircleLocation.set(location.x + currentFrame.getRegionWidth()/3, location.y + currentFrame.getRegionHeight()/4);
 			break;
 		case Up:
 			//System.out.println("State is up");
@@ -158,9 +160,9 @@ public class Player extends Entity{
 	{
 		interact();
 		if(Gdx.input.isKeyPressed(Keys.W)){ location.y += 40 ; state = State.Up;}
-		else if(Gdx.input.isKeyPressed(Keys.S)){ location.y -=40 ; state = State.Down;}
+		else if(Gdx.input.isKeyPressed(Keys.S)){ location.y -=4 ; state = State.Down;}
 		else if(Gdx.input.isKeyPressed(Keys.D)){ location.x += 40 ; state = State.Right;}
-		else if(Gdx.input.isKeyPressed(Keys.A)){ location.x -= 40 ; state = State.Left;}
+		else if(Gdx.input.isKeyPressed(Keys.A)){ location.x -= 4 ; state = State.Left;}
 	}
 	
 	public void loadMap()
@@ -200,6 +202,12 @@ public class Player extends Entity{
 	
 	public Rectangle getCollision(){return boundingRectangle;}
 	public Circle getInteraction(){return interactCircle;}
+	
+	public void fullStop()
+	{
+		location = previousLocation;
+		System.out.println("FULL STOP!");
+	}
 
 	
 	

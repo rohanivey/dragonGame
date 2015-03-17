@@ -13,10 +13,18 @@ public abstract class Entity {
 	MainState ms;
 	Rectangle collisionShape;
 	Vector2 location;
+	Type type;
+	Player p;
 	
-	Entity(int inputX, int inputY)
+	enum Type
+	{
+		Friendly, Neutral, Hostile
+	}
+	
+	Entity(int inputX, int inputY, Player inputPlayer)
 	{
 		location = new Vector2(inputX, inputY);
+		p = inputPlayer;
 	}
 	
 	public void update()
@@ -31,21 +39,38 @@ public abstract class Entity {
 	public float getX(){return location.x;}
 	public float getY(){return location.y;}
 	
-	public void handleCollision(Entity e)
+	public void handleCollision(Player player)
 	{
-		if(Intersector.overlaps(e.getCollision(), collisionShape))
+		if(Intersector.overlaps(player.getCollision(), collisionShape))
 		{
+			p.fullStop();
+			switch(type)
+			{
+			case Friendly:
+				System.out.println("Friendly collision detected with " + this.toString());
+				break;
+			case Hostile:
+				System.out.println("Hostile collision detected with " + this.toString());
+				break;
+			default:
+				System.out.println("Neutral collision detected with " + this.toString());
+				break;
+			
+			}
 			System.out.println("Collision with player detected!");
+			collide();
 		}
 	}
 	
-	public void handleInteraction(Entity e)
+	public void handleInteraction(Player player)
 	{
-		if(Intersector.overlaps(e.getInteraction(), collisionShape))
+		if(Intersector.overlaps(player.getInteraction(), collisionShape))
 		{
 			interact();
 		}
 	}
+	
+	public void collide(){}
 	
 	public void interact()
 	{
