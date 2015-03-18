@@ -171,20 +171,33 @@ public class Player{
 	{
 		
 		Rectangle tempCollision;
+		Boolean canMove = true;
+
+		
 		if(Gdx.input.isKeyPressed(Keys.W))
 		{
 			state = State.Up;
+		
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y + speed, this.getCollision().width, this.getCollision().height);
-				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				if(Intersector.overlaps(tempCollision, e.getCollision()))
 				{
-					location.y += speed ; 
-				}
-				else
-				{
+					canMove = false;
 					e.handleCollision(this);
 				}
+			}
+			for(Rectangle r: ms.getColliders())
+			{
+				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y + speed, this.getCollision().width, this.getCollision().height);
+				if(Intersector.overlaps(tempCollision, r))
+				{
+					canMove = false;
+				}
+			}
+			if(canMove)
+			{
+				location.y += speed;
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Keys.S))
@@ -193,14 +206,23 @@ public class Player{
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y - speed, this.getCollision().width, this.getCollision().height);
-				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				if(Intersector.overlaps(tempCollision, e.getCollision()))
 				{
-					location.y -= speed ; 
-				}
-				else
-				{
+					canMove = false;
 					e.handleCollision(this);
 				}
+			}
+			for(Rectangle r: ms.getColliders())
+			{
+				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y - speed, this.getCollision().width, this.getCollision().height);
+				if(Intersector.overlaps(tempCollision, r))
+				{
+					canMove = false;
+				}
+			}
+			if(canMove)
+			{
+				location.y -= speed;
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Keys.A))
@@ -209,14 +231,23 @@ public class Player{
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x - speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
-				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				if(Intersector.overlaps(tempCollision, e.getCollision()))
 				{
-					location.x -= speed ; 
-				}
-				else
-				{
+					canMove = false;
 					e.handleCollision(this);
 				}
+			}
+			for(Rectangle r: ms.getColliders())
+			{
+				tempCollision = new Rectangle(this.getCollision().x - speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
+				if(Intersector.overlaps(tempCollision, r))
+				{
+					canMove = false;
+				}
+			}
+			if(canMove)
+			{
+				location.x -= speed;
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Keys.D))
@@ -225,14 +256,23 @@ public class Player{
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x + speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
-				if(!Intersector.overlaps(tempCollision, e.getCollision()))
+				if(Intersector.overlaps(tempCollision, e.getCollision()))
 				{
-					location.x += speed ; 
-				}
-				else
-				{
+					canMove = false;
 					e.handleCollision(this);
 				}
+			}
+			for(Rectangle r: ms.getColliders())
+			{
+				tempCollision = new Rectangle(this.getCollision().x + speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
+				if(Intersector.overlaps(tempCollision, r))
+				{
+					canMove = false;
+				}
+			}
+			if(canMove)
+			{
+				location.x += speed;
 			}
 		}
 	}

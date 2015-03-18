@@ -13,8 +13,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 
 
 public class MainState extends GameState{
@@ -37,6 +39,7 @@ public class MainState extends GameState{
 	int[] overheadLayers;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private Music carnivalMusic;
+	private ArrayList<Rectangle> colliders;
 	
 	
 	private ShapeRenderer sr;
@@ -59,6 +62,8 @@ public class MainState extends GameState{
 		
 		level = new ArrayList<TiledMap>();
 		areaLoad("firstMap.tmx");
+		System.out.println(colliders.size());
+		
 		//Render the map created above at 1/16th scale
 		
 		
@@ -98,17 +103,32 @@ public class MainState extends GameState{
 	public TiledMap makeTileMap(String inputString)
 	{
 		TiledMap tileMap = new TmxMapLoader().load(inputString);
-		
+		colliders = new ArrayList<Rectangle>();
 		bg = (TiledMapTileLayer)tileMap.getLayers().get("Background");
 		fg = (TiledMapTileLayer)tileMap.getLayers().get("Foreground");
 		oj = (TiledMapTileLayer)tileMap.getLayers().get("Objects");
 		oh = (TiledMapTileLayer)tileMap.getLayers().get("Overhead");
+
+		for(int row = 0; row < oj.getHeight(); row++)
+		{
+			for(int col = 0; col < oj.getWidth(); col++)
+			{
+				Cell cell = oj.getCell(col, row);
+				if(cell == null) continue;
+				if(cell.getTile() == null) continue;
+				
+				Rectangle r = new Rectangle(col* oj.getTileWidth(), row * oj.getTileHeight(), oj.getTileWidth(), oj.getTileHeight());
+				colliders.add(r);
+			}
+		}
 		
+		//TODO FIGURE OUT IF I STILL NEED THIS
 		int[] backgroundLayers = {0};
 		int[] overheadLayers = {1};
 		return tileMap;
 	}
 	
+	//TODO DO I NEED THIS?
 	public void createLayer(TiledMapTileLayer inputLayer)
 	{
 		
@@ -150,7 +170,7 @@ public class MainState extends GameState{
 		
 		sr.setProjectionMatrix(cam.combined);
 		
-		/*
+		
 		sr.begin(ShapeType.Filled);
 		sr.setColor(Color.RED);
 		sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
@@ -158,8 +178,10 @@ public class MainState extends GameState{
 		for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
 		sr.setColor(Color.BLACK);
 		sr.circle(player.getInteraction().x, player.getInteraction().y, player.getInteraction().radius);
+		sr.setColor(Color.GREEN);
+		for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
 		sr.end();
-		*/		
+				
 		
 		hud.setProjectionMatrix(hudCam.combined);
 		hud.begin();
@@ -172,7 +194,6 @@ public class MainState extends GameState{
 	
 	public void addEntity(Entity e)
 	{
-		
 		critters.add(e);
 	}
 	
@@ -185,5 +206,6 @@ public class MainState extends GameState{
 	public GameStateManager getGSM(){return gsm;}
 	public void stopPlayer(){player.fullStop();}
 	public ArrayList<Entity> getCritters(){return critters;}
+	public ArrayList<Rectangle> getColliders(){return colliders;}
 	
 }
