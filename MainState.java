@@ -40,7 +40,7 @@ public class MainState extends GameState{
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private Music carnivalMusic;
 	private ArrayList<Rectangle> colliders;
-	
+	private Boolean paused;
 	
 	private ShapeRenderer sr;
 	
@@ -57,6 +57,7 @@ public class MainState extends GameState{
 		cam = new OrthographicCamera(450,450);
 		hudCam = new OrthographicCamera(450, 450);
 		hudFont = new BitmapFont();
+		paused = false;
 		
 		critters = new ArrayList<Entity>();
 		
@@ -69,7 +70,7 @@ public class MainState extends GameState{
 		
 		//Music
 		carnivalMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/carnivalrides.ogg"));
-		carnivalMusic.setVolume(0.4f);
+		carnivalMusic.setVolume(0.0f);
 		carnivalMusic.setLooping(true);
 		
 		player = new Player(30, 30, ms);
@@ -84,10 +85,26 @@ public class MainState extends GameState{
 	
 	public void update()
 	{
-		player.update();
-		cameraHandler();
-		//System.out.println("MainState updated");
+		if(!paused)
+		{
+			player.update();
+			entityUpdate();
+			cameraHandler();
+		}
 		
+	}
+	
+	public void pauseUpdate(Boolean inputBoolean)
+	{
+		paused = inputBoolean;
+	}
+	
+	public void entityUpdate()
+	{
+		for(Entity e: critters)
+		{
+			e.update();
+		}
 	}
 	
 	public void areaLoad(String inputString)
@@ -181,7 +198,7 @@ public class MainState extends GameState{
 		sr.setColor(Color.GREEN);
 		for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
 		sr.end();
-				
+			
 		
 		hud.setProjectionMatrix(hudCam.combined);
 		hud.begin();

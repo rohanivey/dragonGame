@@ -128,6 +128,13 @@ public class Player{
 			{
 				interactTimer = 1f;
 				interactCircle.setPosition(interactCircleLocation);
+				for(Entity e: ms.getCritters())
+				{
+					if(Intersector.overlaps(interactCircle, e.getCollision()))
+							{
+								e.interact();
+							}
+				}
 				System.out.println("Circle created at " + interactCircle.x + "," + interactCircle.y);
 			}
 		}

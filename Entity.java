@@ -72,10 +72,8 @@ public abstract class Entity {
 	
 	public void collide(){}
 	
-	public void interact()
-	{
-		System.out.println("Interaction detected!");
-	}
+	public abstract void interact();
+
 	
 
 

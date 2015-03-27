@@ -1,0 +1,32 @@
+<quests> <!--- WRAPPER! --->
+
+
+<questID = 1 name = "Intro quest!">
+	<stage stageID = 0>
+		<requirements>
+		</requirements>
+		<dialogue>
+			<d 1 = "WOOF WOOF! STAGE ONE!" />
+		</dialogue>
+		<results>
+			<acquire item = "bone" />
+			<experience XP = 1000 />
+			<current stageID = 1>
+		</results>
+	</stage stageID>
+	<stage stageID = 1>
+		<requirements>
+			<possess item = "key" />
+		</requirements>
+		<dialogue>
+		</dialogue>
+		<results>
+			<acquire item = "key" />
+			<experience XP = 1000 />
+		</results>
+	</stage stageID = 1>
+</questID>
+
+
+
+</quests><!--- End wrapper --->

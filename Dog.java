@@ -30,5 +30,11 @@ public class Dog extends Entity{
 		return null;
 	}
 
+	@Override
+	public void interact() {
+		System.out.println("WOOF!");
+		
+	}
+
 	
 }
