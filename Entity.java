@@ -24,7 +24,9 @@ public abstract class Entity {
 	BitmapFont chatFont;
 	SpriteBatch sb;
 	Rectangle chatBox;
+	Vector2 chatLoc;
 	ShapeRenderer sr;
+
 	
 	
 	enum Type
@@ -38,12 +40,13 @@ public abstract class Entity {
 		location = new Vector2(inputX, inputY);
 		p = inputPlayer;
 		dh = new DialogueHandler(inputName);
-		sb = new SpriteBatch();
+		sb = ms.getSpriteBatch();
 		chatBox = new Rectangle(0,0,ms.getHUDCamera().viewportWidth, ms.getHUDCamera().viewportHeight/4);
 		chatFont = new BitmapFont();
+		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height - chatFont.getLineHeight());
 		sr = new ShapeRenderer();
-		System.out.println(dh.produceDialogue(0));
-		
+
+
 
 	}
 	
@@ -97,19 +100,35 @@ public abstract class Entity {
 	public void chat()
 	{
 		//Remember to set the player state to chatting when the sub entity interacts with the player
-		sb.setProjectionMatrix(ms.getCamera().combined);
-		sr.setColor(0, 0, 1, 0.5f);
-		sr.setProjectionMatrix(ms.getCamera().combined);
 		
-		sr.begin(ShapeType.Filled);
-		sr.rect(chatBox.x, chatBox.y, chatBox.width,chatBox.height);
-		sr.end();
-		
-		sb.begin();
-		chatFont.draw(sb, dh.produceDialogue(0), chatBox.x + 32, chatBox.y + chatBox.height-chatFont.getLineHeight()*2);
-		sb.end();
+		//TODO: Add a Dialogue handler method here to refresh the selections available for chat
 	}
 
+		public DialogueHandler getDialogueHandler()
+		{
+			return dh;
+		}
+		
+		public Rectangle getChatBox()
+		{
+			return chatBox;
+		}
+		
+		public void setChatLocY(int inputY)
+		{
+			chatLoc.y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputY;
+		}
+		
+		public Vector2 getChatLoc()
+		{
+			return chatLoc;
+		}
+		
+		public float getChatLocY(int inputInt)
+		{
+			float y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputInt;
+			return y;
+		}
 
 
 }

@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.rohan.dragonGame.Player.State;
 
 
@@ -45,6 +46,10 @@ public class MainState extends GameState{
 	private Boolean paused;
 	
 	private ShapeRenderer sr;
+	private Rectangle chatBox;
+	private Vector2 chatLoc;
+	private BitmapFont chatFont;
+
 	
 	
 	
@@ -79,6 +84,9 @@ public class MainState extends GameState{
 		Entity testDog;
 		addEntity(testDog = new Dog(90, 90, player, ms));
 
+		chatBox = new Rectangle(0,0,ms.getCamera().viewportWidth, ms.getCamera().viewportHeight/4);
+		chatFont = new BitmapFont();
+		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height - chatFont.getLineHeight());
 		
 		//Debug things
 		sr = new ShapeRenderer();
@@ -187,13 +195,25 @@ public class MainState extends GameState{
 		
 		if(player.getState() == State.Chatting)
 		{
-			player.getActiveEntity().chat();
+			//Shape renderer and sprite batch both force OpenGL to different states, so you must end one before beginning the next 
+			sb.end();
+			renderChatBox();
+			sb.begin();
+			
+			for(int i = 0; i < player.getActiveEntity().getDialogueHandler().getTalkingPoints().size(); i++)
+			{
+				setChatLocY(i);
+				chatFont.draw(sb, player.getActiveEntity().getDialogueHandler().produceDialogue(i), chatLoc.x, chatLoc.y);
+			}
+			
+			sb.draw(player.getActiveEntity().getDialogueHandler().getTexture(), chatLoc.x - 12, getChatLocY(player.getChatSelection()) - 8, 12, 8);
+			
 		}
-		
-		
 		
 		sb.end();
 		
+		//Shape testing and boundary checker
+		/*
 		sr.setProjectionMatrix(cam.combined);
 		sr.begin(ShapeType.Filled);
 		sr.setColor(Color.RED);
@@ -205,6 +225,7 @@ public class MainState extends GameState{
 		sr.setColor(Color.GREEN);
 		for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
 		sr.end();
+		*/
 			
 		
 		hud.setProjectionMatrix(hudCam.combined);
@@ -226,6 +247,32 @@ public class MainState extends GameState{
 			
 	}
 	
+	public void renderChatBox()
+	{
+		sr.setColor(0, 0, 1, 0.5f);
+		sr.setProjectionMatrix(ms.getCamera().combined);
+		
+		sr.begin(ShapeType.Filled);
+		sr.rect(chatBox.x, chatBox.y, chatBox.width,chatBox.height);
+		sr.end();
+	}
+	
+	public void setChatLocY(int inputY)
+	{
+		chatLoc.y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputY;
+	}
+	
+	public Vector2 getChatLoc()
+	{
+		return chatLoc;
+	}
+	
+	public float getChatLocY(int inputInt)
+	{
+		float y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputInt;
+		return y;
+	}
+	
 	public MapProperties getCurrentMapProperties(){ return level.get(0).getProperties();}
 	public GameStateManager getGSM(){return gsm;}
 	public void stopPlayer(){player.fullStop();}
@@ -233,5 +280,9 @@ public class MainState extends GameState{
 	public ArrayList<Rectangle> getColliders(){return colliders;}
 	public OrthographicCamera getCamera(){return cam;}
 	public OrthographicCamera getHUDCamera(){return hudCam;}
+	public SpriteBatch getSpriteBatch(){return sb;}
+	
+	
+	
 	
 }

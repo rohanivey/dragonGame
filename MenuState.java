@@ -57,7 +57,7 @@ public class MenuState extends GameState {
 		{
 			System.out.println("Down/S pressed");
 			timer = 0;
-			if(currentSelection < menu.length -1)
+			if(currentSelection < menu.length - 1)
 				++currentSelection;
 			else currentSelection = 0;
 		}

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Circle;
@@ -45,6 +46,8 @@ public class Player{
 	private int speed;
 	
 	private Entity activeEntity;
+	
+	private int chatSelection;
 
 	enum AnimationState 
 	{
@@ -192,7 +195,7 @@ public class Player{
 		//Else, check if player is chatting
 		else if (currentState == State.Chatting)
 		{
-			
+		checkChatting();	
 		}
 		
 		//Else check if fishing
@@ -312,6 +315,40 @@ public class Player{
 		}
 	}
 	
+	public void checkChatting()
+	{
+		interactTimer -= ms.getGSM().getDeltaTime();
+		if(interactTimer <= 0)
+		{
+			if(Gdx.input.isKeyPressed(Keys.W))
+			{
+				interactTimer = 0.25f;
+				if(chatSelection == 0)
+				{
+					chatSelection = activeEntity.getDialogueHandler().getTalkingPoints().size() - 1;
+				}
+				else
+				{
+					chatSelection--;
+				}
+			}
+			
+			if(Gdx.input.isKeyPressed(Keys.S))
+			{
+				interactTimer = 0.25f;
+				if(chatSelection < activeEntity.getDialogueHandler().getTalkingPoints().size() - 1)
+				{
+					chatSelection += 1;
+				}
+				else
+				{
+					chatSelection = 0;
+				}
+			}
+		}
+		
+	}
+	
 	public void loadMap()
 	{
 		mapProperties = ms.getCurrentMapProperties();
@@ -393,6 +430,11 @@ public class Player{
 	public Entity getActiveEntity()
 	{
 		return activeEntity;
+	}
+	
+	public int getChatSelection()
+	{
+		return chatSelection;
 	}
 	
 	

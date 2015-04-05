@@ -2,9 +2,10 @@ package com.rohan.dragonGame;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
@@ -13,12 +14,16 @@ public class DialogueHandler {
 	
 	//private String npc;
 	private ArrayList<String> talkingPoints; 
+	private Texture img;
+	private Sprite sprite;
 
 	
 	
 	DialogueHandler(String inputNPC)
 	{
 		talkingPoints = new ArrayList<String>();
+		img = new Texture(Gdx.files.internal("pointer.png"));
+		sprite = new Sprite(img);
 		
 		XmlReader reader = new XmlReader();
 		try {
@@ -56,9 +61,14 @@ public class DialogueHandler {
 		return talkingPoints.get(inputInt);
 	}
 	
-	public void startConversation()
+	public ArrayList<String> getTalkingPoints()
 	{
-		
+		return talkingPoints;
+	}
+	
+	public Sprite getTexture()
+	{
+		return sprite;
 	}
 	
 }
