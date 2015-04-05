@@ -22,11 +22,13 @@ public class Player{
 	private int mapWidth;
 	private int mapHeight;
 	
+	
 	private Animation walkLeft;
 	private Animation walkRight;
 	private Animation walkUp;
 	private Animation walkDown;
-	State state = State.Down;
+	AnimationState animationState = AnimationState.Down;
+	State currentState = State.Moving;
 	float stateTime;
 	TextureRegion[] animationFrames;
 	TextureRegion currentFrame;
@@ -41,10 +43,17 @@ public class Player{
 	private float interactTimer;
 	
 	private int speed;
+	
+	private Entity activeEntity;
 
-	enum State 
+	enum AnimationState 
 	{
 		Left, Right, Up, Down
+	}
+	
+	enum State
+	{
+		Chatting, Moving, Trading, Fishing
 	}
 	
 	public Player(int inputX, int inputY, MainState inputMainState)
@@ -104,10 +113,12 @@ public class Player{
 
 	public void update()
 	{ 
+
 		handleInput();
 		handleCollision();
 		handleAnimation();
 		screenEdging();
+	
 	}
 	
 	public void handleCollision()
@@ -143,7 +154,7 @@ public class Player{
 	public void handleAnimation()
 	{
 		stateTime += ms.getGSM().getDeltaTime();
-		switch(state)
+		switch(animationState)
 		{
 		case Left:
 			//System.out.println("State is left");
@@ -171,7 +182,24 @@ public class Player{
 	public void handleInput()
 	{
 		interact();
+		
+		//If the player is currently in the moving state then check for movement input
+		if(currentState == State.Moving)
+		{
 		checkMovement();
+		}
+		
+		//Else, check if player is chatting
+		else if (currentState == State.Chatting)
+		{
+			
+		}
+		
+		//Else check if fishing
+		else if(currentState == State.Fishing){}
+		
+		//Else check if trading
+		else if(currentState == State.Trading){}
 	}
 	
 	public void checkMovement()
@@ -183,7 +211,7 @@ public class Player{
 		
 		if(Gdx.input.isKeyPressed(Keys.W))
 		{
-			state = State.Up;
+			animationState = AnimationState.Up;
 		
 			for(Entity e: ms.getCritters())
 			{
@@ -209,7 +237,7 @@ public class Player{
 		}
 		else if(Gdx.input.isKeyPressed(Keys.S))
 		{
-			state = State.Down;
+			animationState= AnimationState.Down;
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y - speed, this.getCollision().width, this.getCollision().height);
@@ -234,7 +262,7 @@ public class Player{
 		}
 		else if(Gdx.input.isKeyPressed(Keys.A))
 		{
-			state = State.Left;
+			animationState = AnimationState.Left;
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x - speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
@@ -259,7 +287,7 @@ public class Player{
 		}
 		else if(Gdx.input.isKeyPressed(Keys.D))
 		{
-			state = State.Right;
+			animationState = AnimationState.Right;
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x + speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
@@ -328,6 +356,45 @@ public class Player{
 		System.out.println("FULL STOP!");
 	}
 
+	@SuppressWarnings("static-access")
+	public void setStateMoving()
+	{
+		currentState = currentState.Moving;
+	}
+	
+	@SuppressWarnings("static-access")
+	public void setStateChatting()
+	{
+		currentState = currentState.Chatting;
+	}
+	
+	@SuppressWarnings("static-access")
+	public void setStateTrading()
+	{
+		currentState = currentState.Trading;
+	}
+	
+	@SuppressWarnings("static-access")
+	public void setStateFishing()
+	{
+		currentState = currentState.Fishing;
+	}
+	
+	public State getState()
+	{
+		return currentState;
+	}
+	
+	public void setActiveEntity(Entity inputActiveEntity)
+	{
+		activeEntity = inputActiveEntity;
+	}
+	
+	public Entity getActiveEntity()
+	{
+		return activeEntity;
+	}
+	
 	
 	
 	

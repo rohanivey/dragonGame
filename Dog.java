@@ -9,8 +9,8 @@ public class Dog extends Entity{
 	Texture img = new Texture("dog.png");
 
 	
-	Dog(int inputX, int inputY, Player inputPlayer) {
-		super(inputX, inputY, inputPlayer);
+	Dog(int inputX, int inputY, Player inputPlayer, MainState inputMainState) {
+		super(inputX, inputY, inputPlayer, "dog", inputMainState);
 		setCollision(img);
 		type = Type.Neutral;
 	}
@@ -32,7 +32,10 @@ public class Dog extends Entity{
 
 	@Override
 	public void interact() {
-		System.out.println("WOOF!");
+
+		p.setActiveEntity(this);
+		p.setStateChatting();
+		chat();
 		
 	}
 

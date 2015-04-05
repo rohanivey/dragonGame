@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.rohan.dragonGame.Player.State;
 
 
 public class MainState extends GameState{
@@ -54,8 +56,8 @@ public class MainState extends GameState{
 		gsm = inputGSM;
 		sb = new SpriteBatch();
 		hud = new SpriteBatch();
-		cam = new OrthographicCamera(450,450);
-		hudCam = new OrthographicCamera(450, 450);
+		cam = new OrthographicCamera(450f,450f);
+		hudCam = new OrthographicCamera(cam.viewportWidth, cam.viewportHeight);
 		hudFont = new BitmapFont();
 		paused = false;
 		
@@ -75,7 +77,7 @@ public class MainState extends GameState{
 		
 		player = new Player(30, 30, ms);
 		Entity testDog;
-		addEntity(testDog = new Dog(90, 90, player));
+		addEntity(testDog = new Dog(90, 90, player, ms));
 
 		
 		//Debug things
@@ -169,8 +171,6 @@ public class MainState extends GameState{
 		
 		mapRenderer.setView(cam);
 		
-
-		
 		sb.setProjectionMatrix(cam.combined);
 		
 		sb.begin();
@@ -183,11 +183,18 @@ public class MainState extends GameState{
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
 		for(Entity e: critters){sb.draw(e.getTexture(), e.getX(), e.getY());}
 		mapRenderer.renderTileLayer(oh);
+		
+		
+		if(player.getState() == State.Chatting)
+		{
+			player.getActiveEntity().chat();
+		}
+		
+		
+		
 		sb.end();
 		
 		sr.setProjectionMatrix(cam.combined);
-		
-		
 		sr.begin(ShapeType.Filled);
 		sr.setColor(Color.RED);
 		sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
@@ -224,5 +231,7 @@ public class MainState extends GameState{
 	public void stopPlayer(){player.fullStop();}
 	public ArrayList<Entity> getCritters(){return critters;}
 	public ArrayList<Rectangle> getColliders(){return colliders;}
+	public OrthographicCamera getCamera(){return cam;}
+	public OrthographicCamera getHUDCamera(){return hudCam;}
 	
 }

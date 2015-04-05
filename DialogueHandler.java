@@ -1,35 +1,64 @@
 package com.rohan.dragonGame;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
 public class DialogueHandler {
 	
-	private String npc;
+	//private String npc;
 	private ArrayList<String> talkingPoints; 
 
 	
 	
 	DialogueHandler(String inputNPC)
 	{
-		npc = inputNPC;
+		talkingPoints = new ArrayList<String>();
+		
 		XmlReader reader = new XmlReader();
-		Element root = reader.parse("DialogueList.xml");
-		Element NPCList = root.getChildByName("NPCS");
-		Element NPC = NPCList.getChildByName(npc);
-		Element options = NPC.getChildByName("options");
-		ArrayList<Element> dialogueOptions = new ArrayList<Element>(options.getChildCount());
-		for(Element option : dialogueOptions)
-		{
-			talkingPoints.add(option.getChildByName("option").getAttribute("action"));
+		try {
+			//This gets you the list of all NPCs
+			Element root = reader.parse(Gdx.files.internal("DialogueList.xml"));
+			//This checks for the npc named in the file list compared to the inputNPC name given at entity creation
+			Element NPC = root.getChildByName(inputNPC);
+			
+			//Making an arraylist of elements based on the options of dialogue
+			//You have to use an Array here. ArrayList hasn't been overridden in the LIBGDX framework like Array has
+			Array<Element> options = NPC.getChildByName("options").getChildrenByName("option");
+			
+
+			//Adds each of those talking points to an easily presentable ArrayList in string format
+			// Loop through each option child in Options
+			for(Element child : options)
+			{
+				talkingPoints.add(child.getAttribute("text"));
+			}
+			//When calling for the chat option, can also make a check for deletion of that particular option
+			//in the arraylist
+			
+			//This is system error checking
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("DUN GUUFED THE DIALOGUEHANDLER");
 		}
 	}
 	
-	public void produceDialogue(int inputInt)
+	public String produceDialogue(int inputInt)
 	{
-		//Say thing at dialogue[i];
+		return talkingPoints.get(inputInt);
+	}
+	
+	public void startConversation()
+	{
+		
 	}
 	
 }
