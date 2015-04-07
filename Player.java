@@ -374,6 +374,10 @@ public class Player{
 	
 	public void checkChatting()
 	{
+		if(!activeEntity.getDialogueHandler().getChatting())
+		{
+			currentState = State.Moving;
+		}
 		//System.out.println("Entering chat mode!");
 		interactTimer -= ms.getGSM().getDeltaTime();
 		if(interactTimer <= 0)
@@ -405,6 +409,7 @@ public class Player{
 			}
 			if(Gdx.input.isKeyPressed(Keys.E))
 			{
+				interactTimer = 0.25f;
 				System.out.println("Player pressed E!");
 				System.out.println("Player e: assigning new knowledge");
 				characterKnowledge[checkNPCID()][findEmptyKnowledge(checkNPCID())] = activeEntity.getDialogueHandler().selectDialogue(chatSelection);

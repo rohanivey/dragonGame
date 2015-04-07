@@ -23,6 +23,8 @@ public class DialogueHandler {
 	private Element root, NPC;
 	private Array<Element> options;
 	
+	private Boolean chatting = false;
+	
 	
 	DialogueHandler(String inputNPC)
 	{
@@ -36,13 +38,17 @@ public class DialogueHandler {
 		playerKnowledgeCopy = new String[0][0];
 		
 
-		createDialogue();
+		//createDialogue();
 
 	}
 	
 	public String selectDialogue(int inputInt)
 	{
 		System.out.println("Trying to select Dialogue in DH");
+		if(inputInt == talkingPoints.size()-1)
+		{
+			chatting = false;
+		}
 		for(Element child: options)
 		{
 			if(talkingPoints.get(inputInt).equals(child.getAttribute("text")))
@@ -54,6 +60,13 @@ public class DialogueHandler {
 		System.out.println("Couldn't find a talking point string match");
 		return null;
 	}
+	
+	public void setChatting(Boolean inputBool)
+	{
+		chatting = inputBool;
+	}
+	
+	public Boolean getChatting(){return chatting;}
 	
 	public String produceDialogue(int inputInt)
 	{
@@ -97,12 +110,13 @@ public class DialogueHandler {
 		System.out.println("Adding talking points!");
 		for(Element child : options)
 		{	
-			if(checkCharacterKnowledge(NPCName, child.getAttribute("requirement")))
+			if(checkCharacterKnowledge(NPCName, child.getAttribute("requirement")) && !checkCharacterKnowledge(NPCName, child.getAttribute("id")))
 			{
 				talkingPoints.add(child.getAttribute("text"));
 				//System.out.println("Talking point added!");
 			}
 		}
+		talkingPoints.add("Goodbye");
 		//When calling for the chat option, can also make a check for deletion of that particular option
 		//in the arraylist
 	}

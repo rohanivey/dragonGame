@@ -33,10 +33,15 @@ public class Dog extends Entity{
 	@Override
 	public void interact() {
 
+		dh.setChatting(true);
+		
 		p.setActiveEntity(this);
 		p.setStateChatting();
 		dh.createDialogue();
-		//chat();
+
+
+		
+
 		
 	}
 
