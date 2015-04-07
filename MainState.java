@@ -180,6 +180,7 @@ public class MainState extends GameState{
 		mapRenderer.setView(cam);
 		
 		sb.setProjectionMatrix(cam.combined);
+		sb.enableBlending();
 		
 		sb.begin();
 		
@@ -191,12 +192,12 @@ public class MainState extends GameState{
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
 		for(Entity e: critters){sb.draw(e.getTexture(), e.getX(), e.getY());}
 		mapRenderer.renderTileLayer(oh);
-		
+		sb.end();		
 		
 		if(player.getState() == State.Chatting)
 		{
-			//Shape renderer and sprite batch both force OpenGL to different states, so you must end one before beginning the next 
-			sb.end();
+			//Shape renderer and sprite batch both force OpenGL to different states, so you must end one before beginning the next
+			//TODO: Replace render chat box with real image, so alpha blending can occur
 			renderChatBox();
 			sb.begin();
 			
@@ -207,10 +208,11 @@ public class MainState extends GameState{
 			}
 			
 			sb.draw(player.getActiveEntity().getDialogueHandler().getTexture(), chatLoc.x - 12, getChatLocY(player.getChatSelection()) - 8, 12, 8);
+			sb.end();
 			
 		}
 		
-		sb.end();
+
 		
 		//Shape testing and boundary checker
 		/*
@@ -249,7 +251,7 @@ public class MainState extends GameState{
 	
 	public void renderChatBox()
 	{
-		sr.setColor(0, 0, 1, 0.5f);
+		sr.setColor(0, 0, 1, 0.1f);
 		sr.setProjectionMatrix(ms.getCamera().combined);
 		
 		sr.begin(ShapeType.Filled);

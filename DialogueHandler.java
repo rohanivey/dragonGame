@@ -2,6 +2,7 @@ package com.rohan.dragonGame;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,7 +17,11 @@ public class DialogueHandler {
 	private ArrayList<String> talkingPoints; 
 	private Texture img;
 	private Sprite sprite;
-
+	private XmlReader reader;
+	private String NPCName;
+	private String[][] playerKnowledgeCopy;
+	private Element root, NPC;
+	private Array<Element> options;
 	
 	
 	DialogueHandler(String inputNPC)
@@ -24,36 +29,30 @@ public class DialogueHandler {
 		talkingPoints = new ArrayList<String>();
 		img = new Texture(Gdx.files.internal("pointer.png"));
 		sprite = new Sprite(img);
+		NPCName = inputNPC;
+		reader = new XmlReader();
 		
-		XmlReader reader = new XmlReader();
-		try {
-			//This gets you the list of all NPCs
-			Element root = reader.parse(Gdx.files.internal("DialogueList.xml"));
-			//This checks for the npc named in the file list compared to the inputNPC name given at entity creation
-			Element NPC = root.getChildByName(inputNPC);
-			
-			//Making an arraylist of elements based on the options of dialogue
-			//You have to use an Array here. ArrayList hasn't been overridden in the LIBGDX framework like Array has
-			Array<Element> options = NPC.getChildByName("options").getChildrenByName("option");
-			
+		//May need to set to 1,1
+		playerKnowledgeCopy = new String[0][0];
+		
 
-			//Adds each of those talking points to an easily presentable ArrayList in string format
-			// Loop through each option child in Options
-			for(Element child : options)
+		createDialogue();
+
+	}
+	
+	public String selectDialogue(int inputInt)
+	{
+		System.out.println("Trying to select Dialogue in DH");
+		for(Element child: options)
+		{
+			if(talkingPoints.get(inputInt).equals(child.getAttribute("text")))
 			{
-				talkingPoints.add(child.getAttribute("text"));
+				System.out.println("The returned id is " + child.getAttribute("id"));
+				return child.getAttribute("id");
 			}
-			//When calling for the chat option, can also make a check for deletion of that particular option
-			//in the arraylist
-			
-			//This is system error checking
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("DUN GUUFED THE DIALOGUEHANDLER");
 		}
+		System.out.println("Couldn't find a talking point string match");
+		return null;
 	}
 	
 	public String produceDialogue(int inputInt)
@@ -63,12 +62,105 @@ public class DialogueHandler {
 	
 	public ArrayList<String> getTalkingPoints()
 	{
+		//System.out.println("There are this many talking Points: " + talkingPoints.size());
 		return talkingPoints;
+	}
+	
+	public int getTalkingPointsSize()
+	{
+		return talkingPoints.size();
 	}
 	
 	public Sprite getTexture()
 	{
 		return sprite;
 	}
+	
+	public void setPlayerKnowledgeCopy(String[][] inputStringArray)
+	{
+		System.out.println("I'm refreshing this entity's knowledge of the player!");
+		playerKnowledgeCopy = new String[inputStringArray.length][inputStringArray[0].length];
+		for(int i = 0; i < inputStringArray.length; i++)
+		{
+			for(int j = 0; j < inputStringArray[i].length; j++)
+			{
+				playerKnowledgeCopy[i][j] = inputStringArray[i][j];
+			}
+		}
+	}
+	
+	public void createDialogue()
+	{
+		getChatOptions();
+		//Adds each of those talking points to an easily presentable ArrayList in string format
+		// Loop through each option child in Options
+		System.out.println("Adding talking points!");
+		for(Element child : options)
+		{	
+			if(checkCharacterKnowledge(NPCName, child.getAttribute("requirement")))
+			{
+				talkingPoints.add(child.getAttribute("text"));
+				//System.out.println("Talking point added!");
+			}
+		}
+		//When calling for the chat option, can also make a check for deletion of that particular option
+		//in the arraylist
+	}
+	
+	public void getChatOptions()
+	{
+		System.out.println("Getting ChatOptions()!");
+		talkingPoints = new ArrayList<String>();
+		//This gets you the list of all NPCs
+		try {
+			root = reader.parse(Gdx.files.internal("DialogueList.xml"));
+		} catch (IOException e) {
+			System.out.println("AIN'T NO FILE THERE MOHONKA!");			
+			e.printStackTrace();
+		}
+		//This checks for the npc named in the file list compared to the inputNPC name given at entity creation
+		NPC = root.getChildByName(NPCName);
+		
+		//Making an arraylist of elements based on the options of dialogue
+		//You have to use an Array here. ArrayList hasn't been overridden in the LIBGDX framework like Array has
+		options = NPC.getChildByName("options").getChildrenByName("option");
+	}
+	
+	public boolean checkCharacterKnowledge(String inputNPC, String inputID)
+	{
+		//System.out.println("Checking character knowledge for " + inputNPC);
+		for(int i = 0; i < playerKnowledgeCopy.length; i++)
+		{
+			if(playerKnowledgeCopy[i][0] == inputNPC)
+			{
+				for(int j = 0; j < playerKnowledgeCopy[i].length; j++)
+				{
+					//System.out.println("I know this NPC! Do I know what I need to about option " + j + " for NPC " + playerKnowledgeCopy[i][0] + "?");
+					if(inputID.equals("none"))
+					{
+						//System.out.println("No knowledge Needed for " + inputID);
+						return true;
+					}
+					else if(playerKnowledgeCopy[i][j] == null)
+					{
+						//System.out.println("No knowledge at " + j);
+						return false;
+					}
+					else if(playerKnowledgeCopy[i][j].equals(inputID))
+					{
+						System.out.println("I know of " + inputID);
+						return true;
+					}
+					else
+					{
+						System.out.println("I don't know about " + inputID);
+						//System.out.println("The inner for loop for checking player knowledge is on iteration: " + j);
+					}
+				}
+				
+			}
+		}
+		return false;
+	}	
 	
 }

@@ -26,7 +26,8 @@ public abstract class Entity {
 	Rectangle chatBox;
 	Vector2 chatLoc;
 	ShapeRenderer sr;
-
+	String[][] pKnowCopy;
+	String myName;
 	
 	
 	enum Type
@@ -45,6 +46,7 @@ public abstract class Entity {
 		chatFont = new BitmapFont();
 		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height - chatFont.getLineHeight());
 		sr = new ShapeRenderer();
+		myName = inputName;
 
 
 
@@ -129,6 +131,8 @@ public abstract class Entity {
 			float y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputInt;
 			return y;
 		}
+		
+		public String getName(){return myName;}
 
 
 }

@@ -35,7 +35,8 @@ public class Dog extends Entity{
 
 		p.setActiveEntity(this);
 		p.setStateChatting();
-		chat();
+		dh.createDialogue();
+		//chat();
 		
 	}
 

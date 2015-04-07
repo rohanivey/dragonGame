@@ -1,10 +1,11 @@
 package com.rohan.dragonGame;
 
+import java.util.Arrays;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Circle;
@@ -48,6 +49,9 @@ public class Player{
 	private Entity activeEntity;
 	
 	private int chatSelection;
+	
+	private String[][] characterKnowledge;
+	Boolean foundName;
 
 	enum AnimationState 
 	{
@@ -112,6 +116,9 @@ public class Player{
 		
 		speed = 4;
 		
+		characterKnowledge = new String[1000][100];
+		characterKnowledge[0][0] = "thyself";
+		
 	}
 
 	public void update()
@@ -140,16 +147,54 @@ public class Player{
 		{
 			if(Gdx.input.isKeyPressed(Keys.E))
 			{
+				//System.out.println("Player has pressed E!");
 				interactTimer = 1f;
 				interactCircle.setPosition(interactCircleLocation);
+				
 				for(Entity e: ms.getCritters())
 				{
 					if(Intersector.overlaps(interactCircle, e.getCollision()))
 							{
-								e.interact();
+								for(int i = 0; i < characterKnowledge.length; i++)
+								{
+									if(characterKnowledge[i][0]== e.getName())
+									{
+										foundName = true;
+										System.out.println("Found Name!");
+										break;
+									}
+									else
+									{
+										foundName = false;
+										//System.out.println("No name found!");
+										//System.out.println(i);
+									}
+								}
+								
+								if(foundName){e.interact();}
+								else
+								{
+									System.out.println("Firing up adding name system");
+									//boolean charKnown = false;
+									for(int i = 0; i < characterKnowledge.length; i++)
+									{
+										System.out.println("I don't know the name yet!");
+										System.out.println("For loop at location " + i);
+											if(characterKnowledge[i][0] == null )
+											{
+												characterKnowledge[i][0] = e.getName();
+												//charKnown = true;
+												e.getDialogueHandler().setPlayerKnowledgeCopy(characterKnowledge);
+												System.out.println("I know the name now! Stored at location " + i);
+												break;
+											}
+									}
+									e.interact();
+								}
+								
 							}
 				}
-				System.out.println("Circle created at " + interactCircle.x + "," + interactCircle.y);
+				
 			}
 		}
 	} 
@@ -184,12 +229,13 @@ public class Player{
 	
 	public void handleInput()
 	{
-		interact();
+
 		
 		//If the player is currently in the moving state then check for movement input
 		if(currentState == State.Moving)
 		{
 		checkMovement();
+		interact();
 		}
 		
 		//Else, check if player is chatting
@@ -203,6 +249,17 @@ public class Player{
 		
 		//Else check if trading
 		else if(currentState == State.Trading){}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.Q))
+		{
+			for(int i = 0; i < characterKnowledge.length; i++)
+			{
+				if(characterKnowledge[i][0] != null)
+				{
+					System.out.println(characterKnowledge[i][0]);					
+				}
+			}
+		}
 	}
 	
 	public void checkMovement()
@@ -317,6 +374,7 @@ public class Player{
 	
 	public void checkChatting()
 	{
+		//System.out.println("Entering chat mode!");
 		interactTimer -= ms.getGSM().getDeltaTime();
 		if(interactTimer <= 0)
 		{
@@ -325,7 +383,7 @@ public class Player{
 				interactTimer = 0.25f;
 				if(chatSelection == 0)
 				{
-					chatSelection = activeEntity.getDialogueHandler().getTalkingPoints().size() - 1;
+					chatSelection = activeEntity.getDialogueHandler().getTalkingPointsSize() - 1;
 				}
 				else
 				{
@@ -336,7 +394,7 @@ public class Player{
 			if(Gdx.input.isKeyPressed(Keys.S))
 			{
 				interactTimer = 0.25f;
-				if(chatSelection < activeEntity.getDialogueHandler().getTalkingPoints().size() - 1)
+				if(chatSelection < activeEntity.getDialogueHandler().getTalkingPointsSize() - 1)
 				{
 					chatSelection += 1;
 				}
@@ -345,8 +403,45 @@ public class Player{
 					chatSelection = 0;
 				}
 			}
+			if(Gdx.input.isKeyPressed(Keys.E))
+			{
+				System.out.println("Player pressed E!");
+				System.out.println("Player e: assigning new knowledge");
+				characterKnowledge[checkNPCID()][findEmptyKnowledge(checkNPCID())] = activeEntity.getDialogueHandler().selectDialogue(chatSelection);
+				System.out.println("Player e: Player should have learned " + activeEntity.getDialogueHandler().selectDialogue(chatSelection));
+				System.out.println("Player e: Reassigning player knowledge copy");
+				activeEntity.getDialogueHandler().setPlayerKnowledgeCopy(characterKnowledge);
+				System.out.println("Player e: Attempting to create dialogue");
+				activeEntity.getDialogueHandler().createDialogue();
+			}
 		}
 		
+	}
+	
+	public int checkNPCID()
+	{
+		for(int i = 0; i < characterKnowledge.length; i++)
+		{
+			if(characterKnowledge[i][0].equals(activeEntity.getName()))
+			{
+				return i;
+			}
+		}
+		System.out.println("No npc yo");
+		return 99999999;
+	}
+	
+	public int findEmptyKnowledge(int inputNPCNumber)
+	{
+		for(int i = 0; i < characterKnowledge[inputNPCNumber].length; i++)
+		{
+			if(characterKnowledge[inputNPCNumber][i] == null)
+			{
+				return i;
+			}
+		}
+		System.out.println("No available spaces for new info on this NPC yo");
+		return 999999;
 	}
 	
 	public void loadMap()
@@ -438,6 +533,9 @@ public class Player{
 	}
 	
 	
+
+	
+
 	
 	
 }
