@@ -201,13 +201,20 @@ public class MainState extends GameState{
 			renderChatBox();
 			sb.begin();
 			
-			for(int i = 0; i < player.getActiveEntity().getDialogueHandler().getTalkingPoints().size(); i++)
+			if(player.getActiveEntity().getDialogueHandler().getResponding())
 			{
-				setChatLocY(i);
-				chatFont.draw(sb, player.getActiveEntity().getDialogueHandler().produceDialogue(i), chatLoc.x, chatLoc.y);
+				setChatLocY(0);
+				chatFont.draw(sb, player.getActiveEntity().getDialogueHandler().getResponse(), chatLoc.x, chatLoc.y);
 			}
-			
-			sb.draw(player.getActiveEntity().getDialogueHandler().getTexture(), chatLoc.x - 12, getChatLocY(player.getChatSelection()) - 8, 12, 8);
+			else
+			{
+				for(int i = 0; i < player.getActiveEntity().getDialogueHandler().getTalkingPoints().size(); i++)
+				{
+					setChatLocY(i);
+					chatFont.draw(sb, player.getActiveEntity().getDialogueHandler().produceDialogue(i), chatLoc.x, chatLoc.y);
+				}
+				sb.draw(player.getActiveEntity().getDialogueHandler().getTexture(), chatLoc.x - 12, getChatLocY(player.getChatSelection()) - 8, 12, 8);
+			}
 			sb.end();
 			
 		}

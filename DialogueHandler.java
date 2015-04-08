@@ -25,6 +25,9 @@ public class DialogueHandler {
 	
 	private Boolean chatting = false;
 	
+	private Boolean responding = false;
+	private String currentResponse;
+	
 	
 	DialogueHandler(String inputNPC)
 	{
@@ -53,6 +56,16 @@ public class DialogueHandler {
 		{
 			if(talkingPoints.get(inputInt).equals(child.getAttribute("text")))
 			{
+	
+				for(Element c: options)
+				{
+					if(child.getAttribute("response").equals(c.getAttribute("id")))
+					{
+						currentResponse = c.getAttribute("text");
+						responding = true;
+					}
+				}
+				
 				System.out.println("The returned id is " + child.getAttribute("id"));
 				return child.getAttribute("id");
 			}
@@ -61,17 +74,43 @@ public class DialogueHandler {
 		return null;
 	}
 	
-	public void setChatting(Boolean inputBool)
+	public String continueDialogue()
 	{
-		chatting = inputBool;
+		//Temporary fill statement here. Should be replaced
+		Element currentChild = options.get(0);
+		
+		for(Element child: options)
+		{
+			if(child.getAttribute("text").equals(currentResponse))
+			{
+				//Should probably make current child a new instance of an Element with all the parts of child, for sec sake.
+				currentChild = child;
+				responding = false;
+			}
+		}
+		for(Element c : options)
+		{
+			if(currentChild.getAttribute("response").equals(c.getAttribute("id")))
+			{
+				currentResponse = c.getAttribute("text");
+				responding  = true;
+				return currentResponse;
+			}
+		}		
+		return currentResponse;
 	}
+	
+	public void setChatting(Boolean inputBool){chatting = inputBool;}
 	
 	public Boolean getChatting(){return chatting;}
 	
-	public String produceDialogue(int inputInt)
-	{
-		return talkingPoints.get(inputInt);
-	}
+	public void setResponding(Boolean inputBool){responding = inputBool;}
+	
+	public Boolean getResponding(){return responding;}
+	
+	public String getResponse(){return currentResponse;}
+	
+	public String produceDialogue(int inputInt){return talkingPoints.get(inputInt);}
 	
 	public ArrayList<String> getTalkingPoints()
 	{
@@ -112,6 +151,7 @@ public class DialogueHandler {
 		{	
 			if(checkCharacterKnowledge(NPCName, child.getAttribute("requirement")) && !checkCharacterKnowledge(NPCName, child.getAttribute("id")))
 			{
+				if(child.getAttribute("saidBy").equals("Player"))
 				talkingPoints.add(child.getAttribute("text"));
 				//System.out.println("Talking point added!");
 			}
@@ -149,6 +189,7 @@ public class DialogueHandler {
 			{
 				for(int j = 0; j < playerKnowledgeCopy[i].length; j++)
 				{
+					
 					//System.out.println("I know this NPC! Do I know what I need to about option " + j + " for NPC " + playerKnowledgeCopy[i][0] + "?");
 					if(inputID.equals("none"))
 					{

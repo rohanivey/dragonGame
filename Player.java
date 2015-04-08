@@ -382,9 +382,19 @@ public class Player{
 		interactTimer -= ms.getGSM().getDeltaTime();
 		if(interactTimer <= 0)
 		{
+			if(activeEntity.getDialogueHandler().getResponding())
+			{
+				if(Gdx.input.isKeyPressed(Keys.E))
+				{
+					interactTimer = 0.25f;
+					activeEntity.getDialogueHandler().continueDialogue();
+				}
+			}
+			else
+			{
 			if(Gdx.input.isKeyPressed(Keys.W))
 			{
-				interactTimer = 0.25f;
+				interactTimer = 0.10f;
 				if(chatSelection == 0)
 				{
 					chatSelection = activeEntity.getDialogueHandler().getTalkingPointsSize() - 1;
@@ -397,7 +407,7 @@ public class Player{
 			
 			if(Gdx.input.isKeyPressed(Keys.S))
 			{
-				interactTimer = 0.25f;
+				interactTimer = 0.10f;
 				if(chatSelection < activeEntity.getDialogueHandler().getTalkingPointsSize() - 1)
 				{
 					chatSelection += 1;
@@ -418,6 +428,7 @@ public class Player{
 				activeEntity.getDialogueHandler().setPlayerKnowledgeCopy(characterKnowledge);
 				System.out.println("Player e: Attempting to create dialogue");
 				activeEntity.getDialogueHandler().createDialogue();
+			}
 			}
 		}
 		
