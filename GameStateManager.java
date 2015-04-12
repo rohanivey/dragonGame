@@ -1,18 +1,16 @@
 package com.rohan.dragonGame;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 
 public class GameStateManager {
 
-	private ArrayList<GameState> gsList;
+	
 	private MenuState menu;
 	private MenuState options;
 	private MainState mainGame;
 	
-	private GameStateManager gsm;
-	private int currentState;
+	
+	
 	
 	private float ticks;
 	private float frames;
@@ -20,26 +18,26 @@ public class GameStateManager {
 	
 	private float dt;
 	
+	private State currentState = State.MainMenu;
+	
+	private enum State  
+	{
+		MainMenu, OptionsMenu, Play, Inventory
+	}
+	
 	public GameStateManager()
 	{
-		gsm = this;
+		//gsm = this;
 		
 		frames = 60;
 		ticks = 1/frames;
 
+		menu = new MenuState();
+		mainGame = new MainState();
 		
-		gsList = new ArrayList<GameState>();
-		menu = new MenuState(gsm);
-		mainGame = new MainState(gsm);
-		gsList.add(menu);
-		gsList.add(options);
-		gsList.add(mainGame);
-		gsList.trimToSize();
 		
-		setState(0);
 		
 		System.out.println("GameStateManager initialized");
-		System.out.println("Gamestate Size is " + gsList.size());
 	}
 	
 	public void update()
@@ -48,42 +46,82 @@ public class GameStateManager {
 		totalTime += dt;
 		if(totalTime >= ticks)
 		{
-			gsList.get(currentState).update();
+			//gsList.get(currentState).update();
 			totalTime = 0;
-			//System.out.println("Time Reset!");
+			
+			switch(currentState)
+			{
+			case MainMenu:
+				if(menu.stateChange())
+				{
+					String tempString = menu.getState();
+					changeState(tempString);
+				}
+				else
+				{
+					menu.update();
+				}
+				break;
+			//case OptionsMenu:
+				//menu.update();
+				//break;
+			case Play:
+				if(mainGame.stateChange())
+				{
+					String tempString = menu.getState();
+					changeState(tempString);
+				}
+				else
+				{
+					mainGame.update();
+				}
+				break;
+			//case Inventory:
+				//menu.update();
+				//break;				
+			default:
+				break;
+				
+			}
+			
+			
 		}
 		
 		//System.out.println("Total Time: " + totalTime + "\nDelta Time: " + Gdx.graphics.getDeltaTime() + "\n\n********\n\n");
 	}
-	
-	public ArrayList<GameState> getList()
-	{
-		return gsList;
-	}
-	
-	public GameStateManager returnGameStateManager()
-	{
-		return gsm;
-	}
-	
-	public void setState(int inputState)
-	{
-		gsList.get(currentState).stopMusic();
-		currentState = inputState;
-		gsList.get(currentState).startMusic();
-		/*Current States are
-		 * Main = 0
-		 * Options = 1
-		 * Game = 2
-		 * Inventory = 3
-		 * Credits = 4
-		 */
-		
-	}
-	
-	public int getCurrentState() {return currentState;}
-	
+
 	public float getDeltaTime(){ return dt;}
 	
+	
+	public void stateDraw()
+	{
+		switch(currentState)
+		{
+		case MainMenu:
+			menu.draw();
+			break;
+		case Play:
+			mainGame.draw();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public void changeState(String inputString)
+	{
+		switch(inputString)
+		{
+		case "Main":
+			currentState = currentState.MainMenu;
+			break;
+		case "Play":
+			currentState = currentState.Play;
+			break;
+		case "Options":
+			currentState = currentState.OptionsMenu;
+			break;
+		}
+	}
 	
 }

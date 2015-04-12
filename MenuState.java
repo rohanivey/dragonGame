@@ -14,14 +14,15 @@ public class MenuState extends GameState {
 	private BitmapFont font;
 	private String[] menu = {"New Game", "Options", "Exit"};
 	private int currentSelection;
-	private GameStateManager gsm;
 	private float timer;
+	private Boolean changeState = false;
+	private enum State {Options, Play}
+	private State newState;
 	
 	private Music menuMusic;
 	
-	public MenuState(GameStateManager inputGSM)
+	public MenuState()
 	{
-		gsm = inputGSM;
 		sb = new SpriteBatch();
 		bg = new Texture("badlogic.jpg");
 		font = new BitmapFont();
@@ -62,6 +63,7 @@ public class MenuState extends GameState {
 			else currentSelection = 0;
 		}
 		}
+
 	}
 	
 	public void startMusic(){menuMusic.play();}
@@ -69,17 +71,18 @@ public class MenuState extends GameState {
 	
 	public void select()
 	{
+		changeState = true;
 		switch(currentSelection)
 		{	
 		//New Game
 		case 0:
 			//Swap state to MainState
-			gsm.setState(2);
+			newState = newState.Play;
 			break;
 		//Options
 		case 1:
 			//Swap state to Options
-			gsm.setState(1);	
+			newState = newState.Options;
 			break;
 		//Exit game
 		case 2:
@@ -89,8 +92,23 @@ public class MenuState extends GameState {
 			
 			break;
 		default:
-		}	
+		}
 		
+	}
+	
+	public String getState()
+	{
+		String returnString = new String();
+		switch(newState)
+		{
+		case Play:
+			returnString = "Play";
+			break;
+		case Options:
+			returnString = "Options";
+			break;
+		}
+		return returnString;
 	}
 	
 	public void draw()
@@ -116,6 +134,11 @@ public class MenuState extends GameState {
 		bg.dispose();
 		font.dispose();
 		menuMusic.dispose();
+	}
+	
+	public Boolean stateChange()
+	{
+		return changeState;
 	}
 
 }

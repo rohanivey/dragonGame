@@ -1,6 +1,7 @@
 package com.rohan.dragonGame;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -51,7 +52,11 @@ public class Player{
 	private int chatSelection;
 	
 	private String[][] characterKnowledge;
-	Boolean foundName;
+	private Boolean foundName;
+	
+	private ArrayList<Item> itemsInInventory;
+	private TradeHandler th;
+	private Boolean tradeSetup = false;
 
 	enum AnimationState 
 	{
@@ -119,6 +124,8 @@ public class Player{
 		characterKnowledge = new String[1000][100];
 		characterKnowledge[0][0] = "thyself";
 		
+		itemsInInventory = new ArrayList<Item>();
+		
 	}
 
 	public void update()
@@ -141,7 +148,7 @@ public class Player{
 	public void interact()
 	{
 		interactCircle.setPosition(location);
-		interactTimer -= ms.getGSM().getDeltaTime();
+		interactTimer -= Gdx.graphics.getDeltaTime();
 		
 		if(interactTimer <= 0)
 		{
@@ -150,6 +157,18 @@ public class Player{
 				//System.out.println("Player has pressed E!");
 				interactTimer = 1f;
 				interactCircle.setPosition(interactCircleLocation);
+				
+				for(Iterator<Item> iterator = ms.getItems().iterator(); iterator.hasNext();)
+				{
+					Item i = iterator.next();
+					if(Intersector.overlaps(interactCircle, i.getCollisionShape()))
+					{
+						itemsInInventory.add(i);
+						iterator.remove();
+					}
+					System.out.println("Player inv size: " + itemsInInventory.size());
+					System.out.println("World inv size: " + ms.getItems().size());
+				}
 				
 				for(Entity e: ms.getCritters())
 				{
@@ -201,7 +220,7 @@ public class Player{
 	
 	public void handleAnimation()
 	{
-		stateTime += ms.getGSM().getDeltaTime();
+		stateTime += Gdx.graphics.getDeltaTime();
 		switch(animationState)
 		{
 		case Left:
@@ -234,21 +253,24 @@ public class Player{
 		//If the player is currently in the moving state then check for movement input
 		if(currentState == State.Moving)
 		{
-		checkMovement();
-		interact();
+			checkMovement();
+			interact();
 		}
 		
 		//Else, check if player is chatting
 		else if (currentState == State.Chatting)
 		{
-		checkChatting();	
+			checkChatting();	
 		}
 		
 		//Else check if fishing
 		else if(currentState == State.Fishing){}
 		
 		//Else check if trading
-		else if(currentState == State.Trading){}
+		else if(currentState == State.Trading)
+		{
+			checkTrading();
+		}
 		
 		if(Gdx.input.isKeyJustPressed(Keys.Q))
 		{
@@ -372,14 +394,43 @@ public class Player{
 		}
 	}
 	
+	public void setupTrading()
+	{
+		System.out.println("Setting up trading system in player setupTrading()");
+		th = new TradeHandler(itemsInInventory, activeEntity.getInventory());
+		tradeSetup = true;
+	}
+	
+	public void checkTrading()
+	{
+		if(!tradeSetup){setupTrading();System.out.println("setupTrading() complete");}
+		if(th.getTrading())
+		{
+			System.out.println("player trading");
+			th.Update();
+			th.Draw();
+		}
+		else
+		{
+			activeEntity.getDialogueHandler().setTrading(false);
+			currentState = State.Chatting;
+			tradeSetup = false;
+		}
+	}	
+	
 	public void checkChatting()
 	{
 		if(!activeEntity.getDialogueHandler().getChatting())
 		{
 			currentState = State.Moving;
 		}
+		if(activeEntity.getDialogueHandler().getTrading())
+		{
+			System.out.println("Setting state to trading in player checkChatting();");
+			currentState = State.Trading;
+		}
 		//System.out.println("Entering chat mode!");
-		interactTimer -= ms.getGSM().getDeltaTime();
+		interactTimer -= Gdx.graphics.getDeltaTime();
 		if(interactTimer <= 0)
 		{
 			if(activeEntity.getDialogueHandler().getResponding())
@@ -547,6 +598,8 @@ public class Player{
 	{
 		return chatSelection;
 	}
+
+
 	
 	
 

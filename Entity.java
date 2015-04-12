@@ -1,12 +1,12 @@
 package com.rohan.dragonGame;
 
-import com.badlogic.gdx.graphics.Color;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -28,7 +28,7 @@ public abstract class Entity {
 	ShapeRenderer sr;
 	String[][] pKnowCopy;
 	String myName;
-	
+	ArrayList<Item> inventory; 
 	
 	enum Type
 	{
@@ -47,6 +47,7 @@ public abstract class Entity {
 		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height - chatFont.getLineHeight());
 		sr = new ShapeRenderer();
 		myName = inputName;
+		inventory = new ArrayList<Item>();
 
 
 
@@ -63,6 +64,7 @@ public abstract class Entity {
 	public abstract TextureRegion getTextureRegion();
 	public float getX(){return location.x;}
 	public float getY(){return location.y;}
+	public ArrayList<Item> getInventory(){return inventory;}
 	
 	public void handleCollision(Player player)
 	{

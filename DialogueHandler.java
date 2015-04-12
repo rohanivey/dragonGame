@@ -28,6 +28,8 @@ public class DialogueHandler {
 	private Boolean responding = false;
 	private String currentResponse;
 	
+	private Boolean trading = false;
+	
 	
 	DialogueHandler(String inputNPC)
 	{
@@ -67,6 +69,10 @@ public class DialogueHandler {
 				}
 				
 				System.out.println("The returned id is " + child.getAttribute("id"));
+				if(child.getAttribute("id").equals("s"))
+				{
+					setTrading(true);
+				}
 				return child.getAttribute("id");
 			}
 		}
@@ -103,6 +109,9 @@ public class DialogueHandler {
 	public void setChatting(Boolean inputBool){chatting = inputBool;}
 	
 	public Boolean getChatting(){return chatting;}
+	
+	public void setTrading(Boolean inputTrading){trading = inputTrading;}
+	public Boolean getTrading(){return trading;}
 	
 	public void setResponding(Boolean inputBool){responding = inputBool;}
 	

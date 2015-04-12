@@ -29,7 +29,7 @@ public class MainState extends GameState{
 	private OrthographicCamera hudCam;
 	private Player player;
 	private ArrayList<TiledMap> level;
-	private GameStateManager gsm;
+
 	private SpriteBatch sb;
 	private SpriteBatch hud;
 	private BitmapFont hudFont;
@@ -44,21 +44,23 @@ public class MainState extends GameState{
 	private Music carnivalMusic;
 	private ArrayList<Rectangle> colliders;
 	private Boolean paused;
+	private Boolean changeState = false;
 	
 	private ShapeRenderer sr;
 	private Rectangle chatBox;
 	private Vector2 chatLoc;
 	private BitmapFont chatFont;
+	
+	private ArrayList<Item> itemsOnScreen;
 
 	
 	
 	
 	private ArrayList<Entity> critters;
 	
-	public MainState(GameStateManager inputGSM)
+	public MainState()
 	{
 		ms = this;
-		gsm = inputGSM;
 		sb = new SpriteBatch();
 		hud = new SpriteBatch();
 		cam = new OrthographicCamera(450f,450f);
@@ -67,6 +69,7 @@ public class MainState extends GameState{
 		paused = false;
 		
 		critters = new ArrayList<Entity>();
+		itemsOnScreen = new ArrayList<Item>();
 		
 		level = new ArrayList<TiledMap>();
 		areaLoad("firstMap.tmx");
@@ -81,8 +84,11 @@ public class MainState extends GameState{
 		carnivalMusic.setLooping(true);
 		
 		player = new Player(30, 30, ms);
-		Entity testDog;
-		addEntity(testDog = new Dog(90, 90, player, ms));
+		Entity testDog = new Dog(90, 90, player, ms);
+		addEntity(testDog);
+		
+		Item testItem = new Item("Dagger", 120, 90);
+		itemsOnScreen.add(testItem);
 
 		chatBox = new Rectangle(0,0,ms.getCamera().viewportWidth, ms.getCamera().viewportHeight/4);
 		chatFont = new BitmapFont();
@@ -114,6 +120,14 @@ public class MainState extends GameState{
 		for(Entity e: critters)
 		{
 			e.update();
+		}
+	}
+	
+	public void itemUpdate()
+	{
+		for(Item i: itemsOnScreen)
+		{
+			i.handleInteraction(player.getInteraction());
 		}
 	}
 	
@@ -182,17 +196,24 @@ public class MainState extends GameState{
 		sb.setProjectionMatrix(cam.combined);
 		sb.enableBlending();
 		
+		if(player.getState() == State.Moving || player.getState() == State.Chatting){
 		sb.begin();
 		
 		mapRenderer.renderTileLayer(bg);
 		mapRenderer.renderTileLayer(fg);
 		mapRenderer.renderTileLayer(oj);
+		
+		for (Item i: itemsOnScreen)
+		{
+			sb.draw(i.getTexture(), i.getLocation().x, i.getLocation().y);
+		}
 		//sb.draw(player.getTexture(), player.getX() - player.getTexture().getWidth()/2, player.getY() - player.getTexture().getWidth()/2);
 		//sb.draw(player.getFrame(), player.getX() - player.getTexture().getRegionWidth()/2, player.getY() - player.getTexture().getRegionHeight()/2);
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
 		for(Entity e: critters){sb.draw(e.getTexture(), e.getX(), e.getY());}
 		mapRenderer.renderTileLayer(oh);
 		sb.end();		
+		}
 		
 		if(player.getState() == State.Chatting)
 		{
@@ -219,22 +240,28 @@ public class MainState extends GameState{
 			
 		}
 		
+		if(player.getState() == State.Trading)
+		{
+			//If I want a different draw method for trading
+		}
+		
 
 		
 		//Shape testing and boundary checker
-		/*
+		
 		sr.setProjectionMatrix(cam.combined);
 		sr.begin(ShapeType.Filled);
 		sr.setColor(Color.RED);
-		sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
+		//sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
 		sr.setColor(Color.BLUE);
-		for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
+		//for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
 		sr.setColor(Color.BLACK);
 		sr.circle(player.getInteraction().x, player.getInteraction().y, player.getInteraction().radius);
 		sr.setColor(Color.GREEN);
-		for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
+		//for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
+		for(Item i: itemsOnScreen){sr.rect(i.getCollisionShape().x, i.getCollisionShape().y, i.getCollisionShape().width, i.getCollisionShape().height);}
 		sr.end();
-		*/
+		
 			
 		
 		hud.setProjectionMatrix(hudCam.combined);
@@ -283,7 +310,6 @@ public class MainState extends GameState{
 	}
 	
 	public MapProperties getCurrentMapProperties(){ return level.get(0).getProperties();}
-	public GameStateManager getGSM(){return gsm;}
 	public void stopPlayer(){player.fullStop();}
 	public ArrayList<Entity> getCritters(){return critters;}
 	public ArrayList<Rectangle> getColliders(){return colliders;}
@@ -291,6 +317,22 @@ public class MainState extends GameState{
 	public OrthographicCamera getHUDCamera(){return hudCam;}
 	public SpriteBatch getSpriteBatch(){return sb;}
 	
+	public ArrayList<Item> getItems(){return itemsOnScreen;}
+	
+	
+	
+	public MainState getCopy()
+	{
+		MainState msCopy = new MainState();
+		return msCopy;
+	}
+	
+	public Boolean stateChange()
+	{
+		return changeState;
+	}
+	
+
 	
 	
 	
