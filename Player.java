@@ -133,7 +133,7 @@ public class Player{
 
 		handleInput();
 		handleCollision();
-		handleAnimation();
+
 		screenEdging();
 	
 	}
@@ -294,7 +294,7 @@ public class Player{
 		if(Gdx.input.isKeyPressed(Keys.W))
 		{
 			animationState = AnimationState.Up;
-		
+			handleAnimation();		
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y + speed, this.getCollision().width, this.getCollision().height);
@@ -320,6 +320,7 @@ public class Player{
 		else if(Gdx.input.isKeyPressed(Keys.S))
 		{
 			animationState= AnimationState.Down;
+			handleAnimation();
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x, this.getCollision().y - speed, this.getCollision().width, this.getCollision().height);
@@ -345,6 +346,7 @@ public class Player{
 		else if(Gdx.input.isKeyPressed(Keys.A))
 		{
 			animationState = AnimationState.Left;
+			handleAnimation();
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x - speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
@@ -370,6 +372,7 @@ public class Player{
 		else if(Gdx.input.isKeyPressed(Keys.D))
 		{
 			animationState = AnimationState.Right;
+			handleAnimation();
 			for(Entity e: ms.getCritters())
 			{
 				tempCollision = new Rectangle(this.getCollision().x + speed, this.getCollision().y, this.getCollision().width, this.getCollision().height);
@@ -406,9 +409,7 @@ public class Player{
 		if(!tradeSetup){setupTrading();System.out.println("setupTrading() complete");}
 		if(th.getTrading())
 		{
-			System.out.println("player trading");
 			th.Update();
-			th.Draw();
 		}
 		else
 		{
@@ -422,6 +423,7 @@ public class Player{
 	{
 		if(!activeEntity.getDialogueHandler().getChatting())
 		{
+			System.out.println("Setting state to moving in player checkChatting()");
 			currentState = State.Moving;
 		}
 		if(activeEntity.getDialogueHandler().getTrading())
@@ -598,6 +600,9 @@ public class Player{
 	{
 		return chatSelection;
 	}
+	
+	public TradeHandler getTradeHandler(){return th;}
+	public Boolean getTradeSetup(){return tradeSetup;}
 
 
 	

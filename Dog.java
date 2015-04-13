@@ -13,6 +13,9 @@ public class Dog extends Entity{
 		super(inputX, inputY, inputPlayer, "dog", inputMainState);
 		setCollision(img);
 		type = Type.Neutral;
+		inventory.add(new Item("Dagger"));
+		inventory.add(new Item("Shield"));
+		inventory.add(new Item("Dagger"));
 	}
 	
 	public Texture Draw(){return img;}

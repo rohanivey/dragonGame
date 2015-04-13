@@ -1,6 +1,7 @@
 package com.rohan.dragonGame;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.rohan.dragonGame.Player.State;
@@ -89,6 +91,12 @@ public class MainState extends GameState{
 		
 		Item testItem = new Item("Dagger", 120, 90);
 		itemsOnScreen.add(testItem);
+		Item testItem2 = new Item("Shield", 150, 90);
+		itemsOnScreen.add(testItem2);
+		Item testItem3 = new Item("DonkHammer", 160, 70);
+		itemsOnScreen.add(testItem3);
+		Item testItem4 = new Item("Dagger", 190, 90);
+		itemsOnScreen.add(testItem4);
 
 		chatBox = new Rectangle(0,0,ms.getCamera().viewportWidth, ms.getCamera().viewportHeight/4);
 		chatFont = new BitmapFont();
@@ -207,6 +215,32 @@ public class MainState extends GameState{
 		{
 			sb.draw(i.getTexture(), i.getLocation().x, i.getLocation().y);
 		}
+			
+			
+			//Shape testing and boundary checker
+			/*
+			sr.setProjectionMatrix(cam.combined);
+			sr.begin(ShapeType.Filled);
+			sr.setColor(Color.RED);
+			//sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
+			sr.setColor(Color.BLUE);
+			//for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
+			sr.setColor(Color.BLACK);
+			sr.circle(player.getInteraction().x, player.getInteraction().y, player.getInteraction().radius);
+			sr.setColor(Color.GREEN);
+			//for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
+			for(Item i: itemsOnScreen){sr.rect(i.getCollisionShape().x, i.getCollisionShape().y, i.getCollisionShape().width, i.getCollisionShape().height);}
+			sr.end();
+			
+				
+			
+			hud.setProjectionMatrix(hudCam.combined);
+			hud.begin();
+			hudFont.draw(hud, "PlayerX:" + player.getX(), 60, 20);
+			hudFont.draw(hud, "Rectangle X:" + player.getCollision().x, 60, 10);
+			hud.end();
+			*/
+
 		//sb.draw(player.getTexture(), player.getX() - player.getTexture().getWidth()/2, player.getY() - player.getTexture().getWidth()/2);
 		//sb.draw(player.getFrame(), player.getX() - player.getTexture().getRegionWidth()/2, player.getY() - player.getTexture().getRegionHeight()/2);
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
@@ -240,35 +274,70 @@ public class MainState extends GameState{
 			
 		}
 		
-		if(player.getState() == State.Trading)
+		if(player.getState() == State.Trading && player.getTradeSetup())
 		{
-			//If I want a different draw method for trading
+			Rectangle vertRect = new Rectangle(0,cam.viewportHeight/4,cam.viewportWidth, cam.viewportHeight - cam.viewportHeight/4);
+			Rectangle horRect = new Rectangle(0,0, cam.viewportWidth, cam.viewportHeight * 0.25f);
+			sr.setProjectionMatrix(cam.combined);
+			sr.begin(ShapeType.Filled);
+			sr.setColor(Color.BLUE);
+			sr.rect(vertRect.x, vertRect.y, vertRect.width, vertRect.height);
+			sr.setColor(Color.DARK_GRAY);
+			sr.rect(horRect.x, horRect.y, horRect.width, horRect.height);
+			sr.setColor(Color.BLACK);
+			sr.line(vertRect.width/2, vertRect.y, vertRect.width/2, vertRect.y + vertRect.height);
+			sr.line(0, horRect.height, horRect.width, horRect.height);
+			Vector2 cir = new Vector2(1,1);
+			switch(player.getTradeHandler().getCurrentList())
+			{
+			case "Player":
+				cir.x = 8;
+				cir.y = vertRect.height + vertRect.y - (player.getTradeHandler().getPISelection() * 16 + 16);
+				break;
+			case "Entity":
+				cir.x = vertRect.width/2 + 8;
+				cir.y = vertRect.height + vertRect.y - (player.getTradeHandler().getEISelection() * 16 + 16);
+				break;
+			}
+			sr.circle(cir.x, cir.y, 4);
+			sr.end();
+			sb.setProjectionMatrix(cam.combined);
+			
+			BitmapFont invText = player.getTradeHandler().getFont();
+			ArrayList<Item> tempPlayerInventory = player.getTradeHandler().getPICopy();
+			ArrayList<Item> tempEntityInventory = player.getTradeHandler().getEICopy();
+			
+			
+			sb.begin();
+			if(tempPlayerInventory.size() > 0)
+			for(int i = 0; i < tempPlayerInventory.size() &&  i < 15; i++)
+			{
+				invText.draw(sb, tempPlayerInventory.get(i).getInputString(), 16, vertRect.height + vertRect.y - (i * 16 + 16));
+			}
+			if(tempEntityInventory.size() > 0)
+			for(int i = 0; i< tempEntityInventory.size() && i < 15; i++)
+			{
+				invText.draw(sb, tempEntityInventory.get(i).getInputString(), vertRect.width/2 + 16, vertRect.height + vertRect.y - (i * 16 + 16));
+			}
+			
+			switch(player.getTradeHandler().getCurrentList())
+			{
+			case "Player":
+				if(tempPlayerInventory.size() > player.getTradeHandler().getPISelection())
+				invText.drawWrapped(sb, tempPlayerInventory.get(player.getTradeHandler().getPISelection()).getDescription(), 16f, horRect.height - 16, horRect.width - 32);
+				break;
+			case "Entity":
+				if(tempEntityInventory.size() > player.getTradeHandler().getEISelection())
+				invText.drawWrapped(sb, tempEntityInventory.get(player.getTradeHandler().getEISelection()).getDescription(), 16f, horRect.height - 16, horRect.width - 32);
+				break;
+			}
+
+			sb.end();
 		}
 		
 
 		
-		//Shape testing and boundary checker
-		
-		sr.setProjectionMatrix(cam.combined);
-		sr.begin(ShapeType.Filled);
-		sr.setColor(Color.RED);
-		//sr.rect(player.getCollision().x, player.getCollision().y, player.getCollision().width, player.getCollision().height);
-		sr.setColor(Color.BLUE);
-		//for(Entity e: critters){sr.rect(e.getCollision().x, e.getCollision().y, e.getCollision().width, e.getCollision().height);}
-		sr.setColor(Color.BLACK);
-		sr.circle(player.getInteraction().x, player.getInteraction().y, player.getInteraction().radius);
-		sr.setColor(Color.GREEN);
-		//for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
-		for(Item i: itemsOnScreen){sr.rect(i.getCollisionShape().x, i.getCollisionShape().y, i.getCollisionShape().width, i.getCollisionShape().height);}
-		sr.end();
-		
-			
-		
-		hud.setProjectionMatrix(hudCam.combined);
-		hud.begin();
-		hudFont.draw(hud, "PlayerX:" + player.getX(), 60, 20);
-		hudFont.draw(hud, "Rectangle X:" + player.getCollision().x, 60, 10);
-		hud.end();
+
 		
 		
 	}

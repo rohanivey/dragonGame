@@ -23,6 +23,7 @@ public class TradeHandler{
 	private BitmapFont font;
 	private OrthographicCamera cam;
 	private ShapeRenderer sr;
+	private float keyCooldown;
 	
 	private enum Lists 
 	{
@@ -35,12 +36,17 @@ public class TradeHandler{
 		font = new BitmapFont();
 		cam = new OrthographicCamera(900f ,600f);
 		sr = new ShapeRenderer();
+		playerInventoryCopy = new ArrayList<Item>();
+		entityInventoryCopy = new ArrayList<Item>();
 		
 		
+		System.out.println("In TradeHandler constructor: ");
 		for(Item i : inputPlayerInventory)
 		{
+			System.out.println("Trying to add item " + i.getInputString());
 			Item iCopy = new Item(i.getInputString());
 			playerInventoryCopy.add(iCopy);
+			System.out.println("Added item " + i.getInputString());
 		}
 		for(Item i : inputEntityInventory)
 		{
@@ -51,44 +57,56 @@ public class TradeHandler{
 	
 	public void Update()
 	{
-		checkInput();
+		//System.out.println("Updating in TradeHandler");
+		keyCooldown -= Gdx.graphics.getDeltaTime();
+		//System.out.println(keyCooldown);
+		checkInput();			
 	}
 	
 	
 	public void checkInput()
 	{
-		if(Gdx.input.isButtonPressed(Keys.W))
+		//System.out.println("Checking for player input in checkInput() in TradeHandler");
+		if(Gdx.input.isKeyPressed(Keys.S) && keyCooldown <= 0)
 		{
+			keyCooldown = 0.25f;
 			if(list == Lists.Player)
 			{
-				if(currentSelectionPL < playerInventoryCopy.size()){currentSelectionPL++;}
+				if(currentSelectionPL < playerInventoryCopy.size() - 1){currentSelectionPL++;}
 				else{currentSelectionPL = 0;}
-				System.out.println("Incrementing selection in player list");
+				System.out.println("Incrementing selection in player list to " + currentSelectionPL);
 			}
 			else
 			{
-				if(currentSelectionEL <  entityInventoryCopy.size()){currentSelectionEL++;}
+				if(currentSelectionEL <  entityInventoryCopy.size() - 1){currentSelectionEL++;}
 				else{currentSelectionEL = 0;}
-				System.out.println("Incrementing selection in entity list");
+				System.out.println("Incrementing selection in entity list to " + currentSelectionEL);
 			}
 		}
 		
-		if(Gdx.input.isButtonPressed(Keys.S))
+		if(Gdx.input.isKeyPressed(Keys.W) && keyCooldown <= 0)
 		{
+			keyCooldown = 0.25f;
 			if(list == Lists.Player)
 			{
 				if(currentSelectionPL > 0){currentSelectionPL--;}
 				else{currentSelectionPL = playerInventoryCopy.size() - 1;}
-				System.out.println("Decrementing selection in player list");
+				System.out.println("Decrementing selection in player list to " + currentSelectionPL);
 			}
 			else
 			{
 				if(currentSelectionEL > 0){currentSelectionEL--;}
-				else{currentSelectionEL = entityInventoryCopy.size() - 1;}			}
-				System.out.println("Decrementing selection in entity list");
+				else{currentSelectionEL = entityInventoryCopy.size() - 1;}
+				System.out.println("Decrementing selection in entity list to " + currentSelectionEL);
+			}
+			//Overriding the issues that can arise when currentSelection is smaller than 0
+			if(currentSelectionPL < 0 ){currentSelectionPL = 0;System.out.println("Overriding selection back to 0");}
+			if(currentSelectionEL < 0 ){currentSelectionEL = 0;System.out.println("Overriding selection back to 0");}
 		}
-		if(Gdx.input.isButtonPressed(Keys.A) || Gdx.input.isButtonPressed(Keys.D))
+		
+		if(Gdx.input.isKeyPressed(Keys.A)  && keyCooldown <= 0 || Gdx.input.isKeyPressed(Keys.D) && keyCooldown <= 0)
 		{
+			keyCooldown = 0.25f;
 			if(list == Lists.Player){list = Lists.Entity;}
 			else {list = Lists.Player;}
 			System.out.println("Swapping current list to: " + list.toString());
@@ -102,23 +120,11 @@ public class TradeHandler{
 	
 	public void setTrading(Boolean inputBoolean){trading = inputBoolean;}
 	public Boolean getTrading(){return trading;}
-	
-	public void Draw()
-	{
-		Rectangle vertRect = new Rectangle(0,cam.viewportHeight/4,cam.viewportWidth, cam.viewportHeight - cam.viewportHeight/4);
-		Rectangle horRect = new Rectangle(0,0, cam.viewportWidth, cam.viewportHeight * 0.25f);
-		sr.setProjectionMatrix(cam.combined);
-		sr.begin(ShapeType.Filled);
-		sr.rect(vertRect.x, vertRect.y, vertRect.width, vertRect.height);
-		sr.rect(horRect.x, horRect.y, horRect.width, horRect.height);
-		sr.end();
-		sb.setProjectionMatrix(cam.combined);
-
-		//Draw left pane
-		//Draw center pane
-		//Draw right pane
-		//SCREW ALL THE ABOVE, DRAW ONE PANE WITH TWO LINES :P
-		//Draw bottom pane, stretches across entire screen
-	}
+	public BitmapFont getFont(){return font;}
+	public ArrayList<Item> getPICopy(){return playerInventoryCopy;}
+	public ArrayList<Item> getEICopy(){return entityInventoryCopy;}
+	public int getPISelection(){return currentSelectionPL;}
+	public int getEISelection(){return currentSelectionEL;}
+	public String getCurrentList(){return list.toString();}
 	
 }
