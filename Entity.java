@@ -135,6 +135,15 @@ public abstract class Entity {
 		}
 		
 		public String getName(){return myName;}
+		
+		public void inputNewInventory(ArrayList<Item> inputInventory)
+		{
+			inventory = new ArrayList<Item>();
+			for(Item i : inputInventory)
+			{
+				inventory.add(i);
+			}
+		}
 
 
 }

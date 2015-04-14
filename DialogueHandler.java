@@ -164,6 +164,8 @@ public class DialogueHandler {
 				talkingPoints.add(child.getAttribute("text"));
 				//System.out.println("Talking point added!");
 			}
+			if(child.getAttribute("saidBy").equals("Player") && child.getAttribute("requirement").equals("shopping"))
+				talkingPoints.add(child.getAttribute("text"));
 		}
 		talkingPoints.add("Goodbye");
 		//When calling for the chat option, can also make a check for deletion of that particular option

@@ -23,6 +23,8 @@ public class Item {
 	private Texture img;
 	private Rectangle collisionShape;
 	private String whatAmI;
+	private int value;
+	private Boolean trading = false;
 	
 	
 	public Item(String inputString)
@@ -56,6 +58,7 @@ public class Item {
 		id = thisItem.getAttribute("id");
 		description = thisItem.getAttribute("description", "NO DESCRIPTION SET!");
 		img = new Texture(Gdx.files.internal(thisItem.getAttribute("sprite")));
+		value = Integer.parseInt(thisItem.getAttribute("initialValue"));
 	}
 	
 	public void setCollision(Texture inputImg){collisionShape = new Rectangle(location.x, location.y, inputImg.getWidth(), inputImg.getHeight());}
@@ -74,5 +77,14 @@ public class Item {
 	public Rectangle getCollisionShape(){return collisionShape;}
 	public String getDescription(){return description;}
 	public String getInputString(){return whatAmI;}
+	public int getValue(){return value;}
+	public void setTrading()
+	{
+		if(trading)
+			trading = false;
+		else
+			trading = true;
+	}
+	public Boolean getTrading(){return trading;}
 	
 }

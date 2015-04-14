@@ -406,17 +406,31 @@ public class Player{
 	
 	public void checkTrading()
 	{
+		//If the trade handler isn't setup, do so now
 		if(!tradeSetup){setupTrading();System.out.println("setupTrading() complete");}
+		//If the trade is good get the updated inventory lists and hook up the player and entity with the new inventories
+		if(th.getGoodTrade())
+		{
+			itemsInInventory = new ArrayList<Item>();
+			for(Item i : th.getPICopy())
+			{
+				itemsInInventory.add(i);
+			}
+			//Set up the entity with post trade inventory copy, it'll set up its inv on its own side
+			activeEntity.inputNewInventory(th.getEICopy());
+			//Tell the entity it's no longer trading
+			activeEntity.getDialogueHandler().setTrading(false);
+			//Tell the player to go back to chat menu
+			currentState = State.Chatting;
+			//Declare there is no longer a chat set up
+			tradeSetup = false;
+		}
+		//update the trade handler
 		if(th.getTrading())
 		{
 			th.Update();
 		}
-		else
-		{
-			activeEntity.getDialogueHandler().setTrading(false);
-			currentState = State.Chatting;
-			tradeSetup = false;
-		}
+
 	}	
 	
 	public void checkChatting()

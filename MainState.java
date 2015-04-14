@@ -306,32 +306,69 @@ public class MainState extends GameState{
 			BitmapFont invText = player.getTradeHandler().getFont();
 			ArrayList<Item> tempPlayerInventory = player.getTradeHandler().getPICopy();
 			ArrayList<Item> tempEntityInventory = player.getTradeHandler().getEICopy();
+
 			
 			
 			sb.begin();
 			if(tempPlayerInventory.size() > 0)
 			for(int i = 0; i < tempPlayerInventory.size() &&  i < 15; i++)
 			{
+				if(!tempPlayerInventory.get(i).getTrading())
+				{
+					invText.setColor(Color.WHITE);
+				}
+				else if (tempPlayerInventory.get(i).getTrading())
+				{
+					invText.setColor(Color.RED);
+				}
 				invText.draw(sb, tempPlayerInventory.get(i).getInputString(), 16, vertRect.height + vertRect.y - (i * 16 + 16));
 			}
+			invText.setColor(Color.WHITE);
+			invText.draw(sb, "Trade", 16, vertRect.height + vertRect.y - (tempPlayerInventory.size() * 16 + 16));
 			if(tempEntityInventory.size() > 0)
 			for(int i = 0; i< tempEntityInventory.size() && i < 15; i++)
 			{
+				if(!tempEntityInventory.get(i).getTrading())
+				{
+					invText.setColor(Color.WHITE);
+				}
+				else if(tempEntityInventory.get(i).getTrading())
+				{
+					invText.setColor(Color.RED);
+				}
 				invText.draw(sb, tempEntityInventory.get(i).getInputString(), vertRect.width/2 + 16, vertRect.height + vertRect.y - (i * 16 + 16));
 			}
+			
+			invText.setColor(Color.WHITE);
 			
 			switch(player.getTradeHandler().getCurrentList())
 			{
 			case "Player":
 				if(tempPlayerInventory.size() > player.getTradeHandler().getPISelection())
+				{
 				invText.drawWrapped(sb, tempPlayerInventory.get(player.getTradeHandler().getPISelection()).getDescription(), 16f, horRect.height - 16, horRect.width - 32);
+				invText.draw(sb, "Value: " + String.valueOf(tempPlayerInventory.get(player.getTradeHandler().getPISelection()).getValue()), 16f, horRect.height - 64);
+				}
 				break;
 			case "Entity":
 				if(tempEntityInventory.size() > player.getTradeHandler().getEISelection())
+				{
 				invText.drawWrapped(sb, tempEntityInventory.get(player.getTradeHandler().getEISelection()).getDescription(), 16f, horRect.height - 16, horRect.width - 32);
+				invText.draw(sb, "Value: " + String.valueOf(tempEntityInventory.get(player.getTradeHandler().getEISelection()).getValue()), 16f, horRect.height - 64);
+				}
 				break;
 			}
-
+			
+			if(player.getTradeHandler().checkPlayerPrices() > player.getTradeHandler().checkEntityPrices())
+			{
+				invText.draw(sb,"Profit: " + (player.getTradeHandler().checkPlayerPrices() - player.getTradeHandler().checkEntityPrices()), 16, horRect.height + 16);
+			}
+			else
+			{
+				invText.draw(sb,"Cost: " + (player.getTradeHandler().checkEntityPrices() - player.getTradeHandler().checkPlayerPrices()), 16, horRect.height + 16);
+			}
+			
+			
 			sb.end();
 		}
 		
