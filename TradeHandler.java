@@ -43,7 +43,7 @@ public class TradeHandler{
 		entityInventoryCopy = new ArrayList<Item>();
 		playerBarter = new ArrayList<Item>();
 		entityBarter = new ArrayList<Item>();
-		keyCooldown = 0.5f;
+		keyCooldown = 0.25f;
 		
 		
 		System.out.println("In TradeHandler constructor: ");

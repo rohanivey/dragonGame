@@ -116,7 +116,7 @@ public class Player{
 		
 		boundingRectangle = new Rectangle();
 		interactCircleLocation = new Vector2(location);
-		interactCircle = new Circle(interactCircleLocation.x, interactCircleLocation.y, 1);
+		interactCircle = new Circle(interactCircleLocation.x, interactCircleLocation.y, 4);
 		interactTimer = 0f;
 		
 		speed = 4;
@@ -155,7 +155,7 @@ public class Player{
 			if(Gdx.input.isKeyPressed(Keys.E))
 			{
 				//System.out.println("Player has pressed E!");
-				interactTimer = 1f;
+				interactTimer = 0.25f;
 				interactCircle.setPosition(interactCircleLocation);
 				
 				for(Iterator<Item> iterator = ms.getItems().iterator(); iterator.hasNext();)
@@ -216,6 +216,9 @@ public class Player{
 				
 			}
 		}
+		
+		if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)){speed = 40;}
+		else{speed = 4;}
 	} 
 	
 	public void handleAnimation()
