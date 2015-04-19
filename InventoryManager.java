@@ -78,10 +78,13 @@ public class InventoryManager {
 					if(checkGridRoom(inputItem, row, col))
 					{
 						//Set the item for the chosen, approved slot
+						System.out.println("Setting the item in the slot to picked up item in InventoryManager.pickUpItem");
 						grid[row][col].setItem(inputItem);
 						//Tell that slot it is now a master
+						System.out.println("Setting slot to master status in InventoryManager.pickUpItem");
 						grid[row][col].setType("MASTER");
 						//Enslave the slots for this item
+						System.out.println("Enslaving slots in InventoryManager.pickUpItem");
 						enslaveSlots(inputItem, row, col);
 						System.out.println("Setting item" + inputItem.getInputString() + " to slot [" + row  + ", " + col + "] in inventoryManager.pickUpItem()");
 						return true;
@@ -154,16 +157,23 @@ public class InventoryManager {
 			for(int j = inputCol; j < maxWidth; j++)
 			{
 				//Set every free slot previously checked by checkGridRoom() to a slave status
-				grid[i][j].setType("SLAVE");
-				//Debug info
-				System.out.println("The slot at coords " + i + ", " + j + " is now enslaved to slot [" + inputRow + ", " + inputCol + "].");
+				//TODO: Fix horrendous hack
+				if(i == inputRow && j == inputCol)
+				{
+					System.out.println("Doing nothing at this location");
+				}
+				else
+				{
+					grid[i][j].setType("SLAVE");
+					//Debug info
+					System.out.println("The slot at coords " + i + ", " + j + " is now enslaved to slot [" + inputRow + ", " + inputCol + "].");					
+				}
 				//Tell every slot assigned as a slave that its new master slot is at grid inputX, inputY
 				grid[i][j].setMaster(grid[inputRow][inputCol]);
+				//Tell the master it has a new slave slot
+				grid[inputRow][inputCol].addSlave(grid[i][j]);
 			}
 		}
-		//Set the master slot back to the master position instead of being slaved to itself
-		grid[inputRow][inputCol].setType("MASTER");
-		grid[inputRow][inputCol].setMaster(null);
 	}
 	
 	public void draw()

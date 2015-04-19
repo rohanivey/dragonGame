@@ -15,7 +15,6 @@ public class Item {
 
 	private String id;
 	private String description;
-	private float Weight;
 	private XmlReader reader;
 	private Element root;
 	private Element thisItem;
@@ -27,9 +26,8 @@ public class Item {
 	private Boolean trading = false;
 	
 	
-	//TODO: SET UP THIS TO BE REAL SIZE
-	private int gridHeight = 1;
-	private int gridWidth = 1;
+	private int gridHeight = 0;
+	private int gridWidth = 0;
 	
 	
 	public Item(String inputString)
