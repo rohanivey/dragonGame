@@ -54,9 +54,6 @@ public class MainState extends GameState{
 	private BitmapFont chatFont;
 	
 	private ArrayList<Item> itemsOnScreen;
-
-	
-	
 	
 	private ArrayList<Entity> critters;
 	
@@ -65,7 +62,7 @@ public class MainState extends GameState{
 		ms = this;
 		sb = new SpriteBatch();
 		hud = new SpriteBatch();
-		cam = new OrthographicCamera(450f,450f);
+		cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		hudCam = new OrthographicCamera(cam.viewportWidth, cam.viewportHeight);
 		hudFont = new BitmapFont();
 		paused = false;
@@ -89,13 +86,15 @@ public class MainState extends GameState{
 		Entity testDog = new Dog(90, 90, player, ms);
 		addEntity(testDog);
 		
-		Item testItem = new Item("Dagger", 120, 90);
+		//Inventory stuff
+		
+		Item testItem = new Item("Dagger", 220, 90);
 		itemsOnScreen.add(testItem);
 		Item testItem2 = new Item("Shield", 150, 90);
 		itemsOnScreen.add(testItem2);
-		Item testItem3 = new Item("DonkHammer", 160, 70);
+		Item testItem3 = new Item("DonkHammer", 360, 70);
 		itemsOnScreen.add(testItem3);
-		Item testItem4 = new Item("Dagger", 190, 90);
+		Item testItem4 = new Item("Dagger", 490, 90);
 		itemsOnScreen.add(testItem4);
 
 		chatBox = new Rectangle(0,0,ms.getCamera().viewportWidth, ms.getCamera().viewportHeight/4);
@@ -370,6 +369,11 @@ public class MainState extends GameState{
 			
 			
 			sb.end();
+		}
+		
+		if(player.getState() == State.Inventory)
+		{
+			player.getInventoryManager().draw();
 		}
 		
 

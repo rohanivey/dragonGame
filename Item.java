@@ -27,6 +27,11 @@ public class Item {
 	private Boolean trading = false;
 	
 	
+	//TODO: SET UP THIS TO BE REAL SIZE
+	private int gridHeight = 1;
+	private int gridWidth = 1;
+	
+	
 	public Item(String inputString)
 	{
 		whatAmI = inputString;
@@ -59,6 +64,8 @@ public class Item {
 		description = thisItem.getAttribute("description", "NO DESCRIPTION SET!");
 		img = new Texture(Gdx.files.internal(thisItem.getAttribute("sprite")));
 		value = Integer.parseInt(thisItem.getAttribute("initialValue"));
+		gridHeight = Integer.parseInt(thisItem.getAttribute("gridHeight"));
+		gridWidth = Integer.parseInt(thisItem.getAttribute("gridWidth"));
 	}
 	
 	public void setCollision(Texture inputImg){collisionShape = new Rectangle(location.x, location.y, inputImg.getWidth(), inputImg.getHeight());}
@@ -86,5 +93,8 @@ public class Item {
 			trading = true;
 	}
 	public Boolean getTrading(){return trading;}
+	
+	public int getGridHeight(){return gridHeight;}
+	public int getGridWidth(){return gridWidth;}
 	
 }

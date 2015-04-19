@@ -57,6 +57,10 @@ public class Player{
 	private ArrayList<Item> itemsInInventory;
 	private TradeHandler th;
 	private Boolean tradeSetup = false;
+	
+	
+	private InventoryManager im;
+	private int str, wis, intel; 
 
 	enum AnimationState 
 	{
@@ -65,7 +69,7 @@ public class Player{
 	
 	enum State
 	{
-		Chatting, Moving, Trading, Fishing
+		Chatting, Moving, Trading, Fishing, Inventory
 	}
 	
 	public Player(int inputX, int inputY, MainState inputMainState)
@@ -126,6 +130,12 @@ public class Player{
 		
 		itemsInInventory = new ArrayList<Item>();
 		
+		
+		str = 5;
+		wis = 3;
+		intel = 0;
+		im = new InventoryManager(this);
+		
 	}
 
 	public void update()
@@ -163,11 +173,19 @@ public class Player{
 					Item i = iterator.next();
 					if(Intersector.overlaps(interactCircle, i.getCollisionShape()))
 					{
-						itemsInInventory.add(i);
-						iterator.remove();
+						if(im.pickUpItem(i))
+						{
+							System.out.println("Item added successfully");
+							iterator.remove();
+							//itemsInInventory.add(i);
+						}
+						else
+						{
+							System.out.println("Item was not added successfully");
+						}
 					}
-					System.out.println("Player inv size: " + itemsInInventory.size());
-					System.out.println("World inv size: " + ms.getItems().size());
+					//System.out.println("Player inv size: " + itemsInInventory.size());
+					//System.out.println("World inv size: " + ms.getItems().size());
 				}
 				
 				for(Entity e: ms.getCritters())
@@ -275,16 +293,17 @@ public class Player{
 			checkTrading();
 		}
 		
-		if(Gdx.input.isKeyJustPressed(Keys.Q))
+		else if(currentState == State.Inventory)
 		{
-			for(int i = 0; i < characterKnowledge.length; i++)
-			{
-				if(characterKnowledge[i][0] != null)
-				{
-					System.out.println(characterKnowledge[i][0]);					
-				}
-			}
+			checkInventory();
 		}
+		
+		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
+		{
+			System.exit(0);
+		}
+		
+
 	}
 	
 	public void checkMovement()
@@ -398,6 +417,13 @@ public class Player{
 				location.x += speed;
 			}
 		}
+		
+		else if(Gdx.input.isKeyJustPressed(Keys.TAB))
+		{
+				currentState = State.Inventory;
+				//ms.getCamera().setToOrtho(true);
+				System.out.println("true ortho");
+		}
 	}
 	
 	public void setupTrading()
@@ -504,6 +530,16 @@ public class Player{
 		
 	}
 	
+	public void checkInventory()
+	{
+		if(Gdx.input.isKeyJustPressed(Keys.TAB))
+		{
+			//ms.getCamera().setToOrtho(false);
+			currentState = State.Moving;
+		}
+		im.update();
+	}
+	
 	public int checkNPCID()
 	{
 		for(int i = 0; i < characterKnowledge.length; i++)
@@ -598,6 +634,12 @@ public class Player{
 		currentState = currentState.Fishing;
 	}
 	
+	@SuppressWarnings("static-access")
+	public void setStateInventory()
+	{
+		currentState = currentState.Inventory;
+	}
+	
 	public State getState()
 	{
 		return currentState;
@@ -620,8 +662,24 @@ public class Player{
 	
 	public TradeHandler getTradeHandler(){return th;}
 	public Boolean getTradeSetup(){return tradeSetup;}
+	
+	public int getStats(String inputStat)
 
+	{
+		switch(inputStat)
+		{
+		case "str":
+			return str;
+		case "wis":
+			return wis;
+		case "intel":
+			return intel;
+		}
+		return 0;
+	}
 
+	public InventoryManager getInventoryManager(){return im;}
+	
 	
 	
 
