@@ -127,17 +127,13 @@ public class MainState extends GameState{
 		cam.update();
 	}
 	
-	//TODO DO I NEED THIS?
-	public void createLayer(TiledMapTileLayer inputLayer)
-	{
-		
-	}
-	
+	@Override
 	public void dispose()
 	{
 			
 	}
 	
+	@Override
 	public void draw()
 	{
 		
@@ -173,18 +169,8 @@ public class MainState extends GameState{
 			//for(Rectangle r: colliders){sr.rect(r.x, r.y, r.width, r.height);}
 			for(Item i: itemsOnScreen){sr.rect(i.getCollisionShape().x, i.getCollisionShape().y, i.getCollisionShape().width, i.getCollisionShape().height);}
 			sr.end();
-			
-				
-			
-			hud.setProjectionMatrix(hudCam.combined);
-			hud.begin();
-			hudFont.draw(hud, "PlayerX:" + player.getX(), 60, 20);
-			hudFont.draw(hud, "Rectangle X:" + player.getCollision().x, 60, 10);
-			hud.end();
 			*/
 
-		//sb.draw(player.getTexture(), player.getX() - player.getTexture().getWidth()/2, player.getY() - player.getTexture().getWidth()/2);
-		//sb.draw(player.getFrame(), player.getX() - player.getTexture().getRegionWidth()/2, player.getY() - player.getTexture().getRegionHeight()/2);
 		sb.draw(player.getFrame(), player.getX() - player.getFrame().getRegionWidth()/2, player.getY());
 		for(Entity e: critters){sb.draw(e.getTexture(), e.getX(), e.getY());}
 		mapRenderer.renderTileLayer(oh);
@@ -220,18 +206,25 @@ public class MainState extends GameState{
 		{
 			
 			player.getTradeHandler().draw();
-			//If player is at a loss
+			//If the value of the goods in the trade window for the player exceeds the value of the good of the NPC
 			if(player.getTradeHandler().checkPrices())
 			{
+				//The player will be trading at a loss, therefore player will need to pay a cost
 				int cost = player.getTradeHandler().getEntityTotal() -  player.getTradeHandler().getPlayerTotal();
 				sb.begin();
+				chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
+				chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
 				chatFont.draw(sb, "Cost: " + cost, 250, 250);
 				sb.end();
 			}
 			else
 			{
-				int profit = player.getTradeHandler().getEntityTotal() - player.getTradeHandler().getPlayerTotal();
+				//This shouldn't really happen, but for measurement purposes so the player can get a running total
+				//The player's profit will be the player's total less the entity's current total
+				int profit =  player.getTradeHandler().getEntityTotal() - player.getTradeHandler().getPlayerTotal();
 				sb.begin();
+				chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
+				chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
 				chatFont.draw(sb, "Profit: " + profit, 250, 250);
 				sb.end();
 			}
@@ -241,12 +234,6 @@ public class MainState extends GameState{
 		{
 			player.getInventoryManager().draw();
 		}
-		
-
-		
-
-		
-		
 	}
 	
 	public void entityUpdate()
@@ -335,18 +322,21 @@ public class MainState extends GameState{
 	{
 		chatLoc.y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputY;
 	}
+	@Override
 	public void startMusic(){carnivalMusic.play();}
 	public Boolean stateChange()
 	{
 		return changeState;
 	}
 	
+	@Override
 	public void stopMusic(){carnivalMusic.stop();}
 	
 	
 	
 	public void stopPlayer(){player.fullStop();}
 	
+	@Override
 	public void update()
 	{
 		if(!paused)

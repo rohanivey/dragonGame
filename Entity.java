@@ -30,6 +30,7 @@ public abstract class Entity {
 	ShapeRenderer sr;
 	String[][] pKnowCopy;
 	String myName;
+	int coins;
 	
 	InventoryManager im;
 	
@@ -75,6 +76,8 @@ public abstract class Entity {
 	}
 	public Circle getInteraction(){return null;}
 	public InventoryManager getInventoryManager(){return im;}
+	public int getCoins(){return coins;}
+	public void setCoins(int inputCoins){coins = inputCoins;}
 	
 	public String getName(){return myName;}
 	
@@ -130,6 +133,8 @@ public abstract class Entity {
 		{
 			im = new InventoryManager(this);
 		}
+		
+		public void setInventoryManager(InventoryManager inputIM){im = inputIM;}
 		
 		public void update()
 		{

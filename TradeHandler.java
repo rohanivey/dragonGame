@@ -5,25 +5,15 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 public class TradeHandler{
 
 	private Boolean trading = true;
-	//private ArrayList<Item> playerInventoryCopy;
-	//private ArrayList<Item> entityInventoryCopy;
 	private InventoryManager playerInventoryCopy;
 	private InventoryManager entityInventoryCopy;
 	private InventoryManager tradeInventory;
-	//private Lists list = Lists.Player;
-	//private int currentSelectionPL = 0;
-	//private int currentSelectionEL = 0;
-	//private SpriteBatch sb;
 	private BitmapFont font;
-	//private OrthographicCamera cam;
-	//private ShapeRenderer sr;
-	//private float keyCooldown;
 	private Boolean goodTrade = false;
-	//ArrayList<Item> playerBarter;
-	//ArrayList<Item> entityBarter;
 	private String entityName;
 	private Entity currentEntity;
 	private Player player;
+	private int playerCoins, entityCoins;
 	
 	
 	
@@ -37,30 +27,51 @@ public class TradeHandler{
 		entityInventoryCopy = inputEntity.getInventoryManager().copyMe();
 		entityName = currentEntity.getName();
 		tradeInventory = new InventoryManager(this);
+		playerCoins = player.getCoins();
+		entityCoins = currentEntity.getCoins();
 	}
 	
 	public Boolean checkPrices()
 	{
+		int playerWorth = getPlayerTotal() + playerCoins;
 		//If the value of the items the player is submitting is higher than the entity's
 		if(getPlayerTotal() >= getEntityTotal())
 		{
 			return true;
 		}
+		//Otherwise, if the value of the player's coin + traded items is greater than the value the entity's trade goods
+		else if(playerWorth >= getEntityTotal())
+		{
+			return true;
+		}
+		//Otherwise, the player doesn't have enough net worth to trade for what they want
+		return false;
+	}
+	
+	public Boolean checkPricesAndCoins()
+	{
+		int playerWorth = getPlayerTotal() + playerCoins;
+		//Otherwise, if the value of the player's coin + traded items is greater than the value the entity's trade goods
+		if(playerWorth >= getEntityTotal())
+		{
+			return true;
+		}
+		//Otherwise, the player doesn't have enough net worth to trade for what they want
 		return false;
 	}
 	
 	public void concludeTrade()
+
 	{
+		player.setInventoryManager(playerInventoryCopy.copyMe());
+		currentEntity.setInventoryManager(entityInventoryCopy.copyMe());
+		player.setCoins(playerCoins);
+		currentEntity.setCoins(entityCoins);
 		setTrading(false);
 		currentEntity.getDialogueHandler().setTrading(false);
 		player.setStateChatting();
 		player.setupTrading();
-		//Tell the entity it's no longer trading
-		//activeEntity.getDialogueHandler().setTrading(false);
-		//Tell the player to go back to chat menu
-		//currentState = State.Chatting;
-		//Declare there is no longer a chat set up
-		//tradeSetup = false;
+		
 	}
 	
 	public void draw()
@@ -79,22 +90,40 @@ public class TradeHandler{
 		if(playerInventoryCopy.getReady())
 		{
 			playerInventoryCopy.draw();
+		}	
+	}
+	
+	public void exchangeCoins()
+	{
+		//TODO: IMPLEMENT BARTER SKILL TO ADJUST THE AMOUNT OF COIN PAID?
+		//If the value of the entity's goods are greater than the player's goods, the player should pay money
+		if(getEntityTotal() > getPlayerTotal())
+		{
+			int difference = getEntityTotal() - getPlayerTotal();
+			playerCoins -= difference;
+			entityCoins += difference;
+			
 		}
-		
-
+		//Else if the value of the player's goods are greater than the entity's, the entity should pay money
+		else if(getPlayerTotal() > getEntityTotal())
+		{
+			int difference = getPlayerTotal() - getEntityTotal();
+			playerCoins += difference;
+			entityCoins -= difference;
+		}
 		
 	}
 	public void exchangeGoods()
 	{
-		for(int row = 0; row < playerInventoryCopy.gridHeight; row++)
+		for(int row = 0; row < tradeInventory.gridHeight; row++)
 		{
-			for(int col = 0; col < playerInventoryCopy.gridWidth; col++)
+			for(int col = 0; col < tradeInventory.gridWidth; col++)
 			{
 				//If the item in the slot is marked for trading
 				if(tradeInventory.getGrid()[row][col].getCurrentItem() != null)
 				{
 					//If the item is owned by the player, it needs to go to the entity
-					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "player")
+					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "PLAYER")
 					{
 						//Set the owner of the item for trade as the entity
 						tradeInventory.getGrid()[row][col].getCurrentItem().setOwner(entityName);
@@ -129,7 +158,7 @@ public class TradeHandler{
 				//If the item in the slot is marked for trading
 				if(tradeInventory.getGrid()[row][col].getCurrentItem() != null)
 				{
-					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "player")
+					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "PLAYER")
 					{
 					}
 					else 
@@ -158,7 +187,7 @@ public class TradeHandler{
 				//If the item in the slot is marked for trading
 				if(tradeInventory.getGrid()[row][col].getCurrentItem() != null)
 				{
-					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "player")
+					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "PLAYER")
 					{
 						playerTotal += tradeInventory.getGrid()[row][col].getCurrentItem().getValue();
 					}
@@ -176,6 +205,12 @@ public class TradeHandler{
 	{
 		if(checkPrices())
 		{
+			exchangeGoods();
+			concludeTrade();
+		}
+		else if(checkPricesAndCoins())
+		{
+			exchangeCoins();
 			exchangeGoods();
 			concludeTrade();
 		}

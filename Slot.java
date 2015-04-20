@@ -235,6 +235,7 @@ public class Slot {
 			//System.out.println("Cursor has an item, however there is already an item in Slot at Slot.touchMaster()");
 			if(myIM.getCursor().testSwap(this))
 			{
+				System.out.println("Slot.touchMaster() is now calling its cursor.swapItem() method");
 				myIM.getCursor().swapItem(this);				
 			}
 		}

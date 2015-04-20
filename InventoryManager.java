@@ -49,9 +49,9 @@ public class InventoryManager {
 		type = inputType;
 		sb = new SpriteBatch();
 		cursor = inputCursor;
-		grid = setupGrid();
-		copyGrid(grid, originalGrid);
+		grid = copyGrid(originalGrid);
 		readyToDraw = true;
+		System.out.println("InventoryManager.Constructor for copyMe() has been created");
 	}
 	
 	public InventoryManager(Player inputPlayer)
@@ -185,33 +185,45 @@ public class InventoryManager {
 		System.out.println("InventoryManager.checkGridRoom() didn't find enough room for the item");
 		return false;
 	}
-	public Slot[][] copyGrid(Slot[][] gridToWrite, Slot[][] gridToRead)
+	public Slot[][] copyGrid(Slot[][] inputGrid)
 	{
-		System.out.println("Copying grid to safe play grid in InventoryManager.copyGrid()");
-		Slot[][] tempGrid = gridToWrite;
-		for(int row = 0; row < gridToRead.length; row++)
+		System.out.println("InventoryManager.copyGrid() is beginning");
+		System.out.println("InventoryManager.copyGrid() inputGrid is " + inputGrid.length + " by " + inputGrid[0].length);
+		//There won't be ragged arrays so assuming [0].length is the same as [15555].length is fine here
+		Slot[][] tempGrid = setupGrid();
+		System.out.println("InventoryManager.copyGrid() tempGrid is " + tempGrid.length + " by " + tempGrid[0].length);
+		System.out.println("InventoryManager.copyGrid() has established tempGrid's[][]");
+		
+		
+		System.out.println("InventoryManager.copyGrid() is entering for loop");		
+		for(int row = 0; row < tempGrid.length; row++)
 		{
-			for(int col = 0; col < gridToRead[row].length; col++ )
+			for(int col = 0; col < tempGrid[row].length; col++ )
 			{
-				if(gridToRead[row][col].getCurrentItem() != null)
+				if(inputGrid[row][col].getCurrentItem() != null)
 				{
-					tempGrid[row][col].setItem(gridToRead[row][col].getCurrentItem().copyMe());
+					System.out.println("InventoryManager.copyGrid() is trying to read the value at " + row + ", " + col);
+					System.out.println("InventoryManager.copyGrid() inputGrid has an item named " + inputGrid[row][col].getCurrentItem().getInputString());
+					Item tempItem = inputGrid[row][col].getCurrentItem().copyMe();
+					System.out.println("InventoryManager.copyGrid() has an established tempItem with the name " + tempItem.getInputString());
+					tempGrid[row][col].setItem(tempItem);
+					System.out.println("InventoryManager.copyGrid() tempGrid now has an item named " + tempGrid[row][col].getCurrentItem().getInputString());
 					//Need to tell the slot to become a master and tell this im that the new slots around it are slaves
 					tempGrid[row][col].setType("MASTER");
 					//Enslave the slots for this item
-					//System.out.println("Enslaving slots in InventoryManager.pickUpItem");
+					System.out.println("Enslaving slots in InventoryManager.pickUpItem");
 					enslaveSlots(tempGrid[row][col].getCurrentItem(), row, col);
-					//System.out.println("Adding copied item " + tempGrid[row][col].getCurrentItem().getInputString()+ " at location:[" + row + ", " + col + "]");
+					System.out.println("Adding copied item " + tempGrid[row][col].getCurrentItem().getInputString()+ " at location:[" + row + ", " + col + "]");
 				}
 
 			}
 		}
-		//System.out.println("Returning temp grid in InventoryManager.copyGrid()");
+		System.out.println("InventoryManager.copyGrid() is ending");
 		return tempGrid;
 	}
 	public InventoryManager copyMe()
 	{
-		System.out.println("Entity type" + type.toString() + "has called for InventoryManager.CopyMe()");
+		System.out.println("Entity type " + type.toString() + " has called for InventoryManager.CopyMe()");
 		return new InventoryManager(gridHeight, gridWidth, startingX, startingY, grid, type, cursor);
 	}
 	public void draw()
@@ -303,7 +315,11 @@ public class InventoryManager {
 		inputSlot.setType("UNUSED");
 	}
 	
-	
+
+	public void setGrid(Slot[][] inputGrid)
+	{
+		grid = inputGrid;
+	}
 	
 	public Slot[][] setupGrid()
 	{

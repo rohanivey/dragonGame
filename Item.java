@@ -51,7 +51,9 @@ public class Item {
 	
 	public Item copyMe()
 	{
+		System.out.println("Item.copyMe() is beginning");
 		Item tempItem = new Item(whatAmI, owner);
+		System.out.println("Item.copyMe() is ending");
 		return tempItem;
 	}
 	

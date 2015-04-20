@@ -65,6 +65,8 @@ public class Player {
 	private InventoryManager im;
 
 	private int str, wis, intel;
+	
+	private int coins = 150;
 
 	public Player(int inputX, int inputY, MainState inputMainState) {
 
@@ -345,6 +347,11 @@ public class Player {
 	public int getChatSelection() {
 		return chatSelection;
 	}
+	
+	public int getCoins()
+	{
+		return coins;
+	}
 
 	public Rectangle getCollision() {
 		return boundingRectangle;
@@ -588,6 +595,10 @@ public class Player {
 	public void setActiveEntity(Entity inputActiveEntity) {
 		activeEntity = inputActiveEntity;
 	}
+	
+	public void setCoins(int inputCoins){coins = inputCoins;}
+	
+	public void setInventoryManager(InventoryManager inputIM){im = inputIM;}
 
 	@SuppressWarnings("static-access")
 	public void setStateChatting() {
