@@ -13,6 +13,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public abstract class Entity {
 	
+	enum Type
+	{
+		Friendly, Neutral, Hostile
+	}
 	MainState ms;
 	Rectangle collisionShape;
 	Vector2 location;
@@ -26,12 +30,8 @@ public abstract class Entity {
 	ShapeRenderer sr;
 	String[][] pKnowCopy;
 	String myName;
-	InventoryManager im;
 	
-	enum Type
-	{
-		Friendly, Neutral, Hostile
-	}
+	InventoryManager im;
 	
 	Entity(int inputX, int inputY, Player inputPlayer, String inputName, MainState inputMainState)
 	{
@@ -47,92 +47,92 @@ public abstract class Entity {
 		myName = inputName;
 	}
 	
-	public void update()
-	{
-	}
-	
-	public Rectangle getCollision(){return collisionShape;}
-	public void setCollision(Texture inputImg){collisionShape = new Rectangle(location.x, location.y, inputImg.getWidth(), inputImg.getHeight());}
-	public Circle getInteraction(){return null;}
-	public abstract Texture getTexture();
-	public abstract TextureRegion getTextureRegion();
-	public float getX(){return location.x;}
-	public float getY(){return location.y;}
-	public InventoryManager getInventoryManager(){return im;}
-	
-	public void handleCollision(Player player)
-	{
-		if(Intersector.overlaps(player.getCollision(), collisionShape))
-		{
-			p.fullStop();
-			switch(type)
-			{
-			case Friendly:
-				System.out.println("Friendly collision detected with " + this.toString());
-				break;
-			case Hostile:
-				System.out.println("Hostile collision detected with " + this.toString());
-				break;
-			default:
-				System.out.println("Neutral collision detected with " + this.toString());
-				break;
-			
-			}
-			System.out.println("Collision with player detected!");
-			collide();
-		}
-	}
-	
-	public void handleInteraction(Player player)
-	{
-		if(Intersector.overlaps(player.getInteraction(), collisionShape))
-		{
-			interact();
-		}
-	}
-	
-	public void collide(){}
-	
-	public abstract void interact();
-	
 	public void chat()
 	{
 		//Remember to set the player state to chatting when the sub entity interacts with the player
 		
 		//TODO: Add a Dialogue handler method here to refresh the selections available for chat
 	}
+	
+	public void collide(){}
+	public Rectangle getChatBox()
+	{
+		return chatBox;
+	}
+	public Vector2 getChatLoc()
+	{
+		return chatLoc;
+	}
+	public float getChatLocY(int inputInt)
+	{
+		float y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputInt;
+		return y;
+	}
+	public Rectangle getCollision(){return collisionShape;}
+	public DialogueHandler getDialogueHandler()
+	{
+		return dh;
+	}
+	public Circle getInteraction(){return null;}
+	public InventoryManager getInventoryManager(){return im;}
+	
+	public String getName(){return myName;}
+	
+	public abstract Texture getTexture();
+	
+	public abstract TextureRegion getTextureRegion();
+	
+	public float getX(){return location.x;}
+	
+	public float getY(){return location.y;}
 
-		public DialogueHandler getDialogueHandler()
+		public void handleCollision(Player player)
 		{
-			return dh;
+			if(Intersector.overlaps(player.getCollision(), collisionShape))
+			{
+				p.fullStop();
+				switch(type)
+				{
+				case Friendly:
+					System.out.println("Friendly collision detected with " + this.toString());
+					break;
+				case Hostile:
+					System.out.println("Hostile collision detected with " + this.toString());
+					break;
+				default:
+					System.out.println("Neutral collision detected with " + this.toString());
+					break;
+				
+				}
+				System.out.println("Collision with player detected!");
+				collide();
+			}
 		}
 		
-		public Rectangle getChatBox()
+		public void handleInteraction(Player player)
 		{
-			return chatBox;
+			if(Intersector.overlaps(player.getInteraction(), collisionShape))
+			{
+				interact();
+			}
 		}
+		
+		public abstract void interact();
 		
 		public void setChatLocY(int inputY)
 		{
 			chatLoc.y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputY;
 		}
 		
-		public Vector2 getChatLoc()
-		{
-			return chatLoc;
-		}
-		
-		public float getChatLocY(int inputInt)
-		{
-			float y = chatBox.height - chatFont.getLineHeight() - chatFont.getLineHeight()*inputInt;
-			return y;
-		}
-		
-		public String getName(){return myName;}
+		public void setCollision(Texture inputImg){collisionShape = new Rectangle(location.x, location.y, inputImg.getWidth(), inputImg.getHeight());}
 		
 		public void setupTrade()
 		{
 			im = new InventoryManager(this);
+		}
+		
+		public void update()
+		{
 		}
 
 

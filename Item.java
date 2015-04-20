@@ -55,6 +55,27 @@ public class Item {
 		return tempItem;
 	}
 	
+	public Rectangle getCollisionShape(){return collisionShape;}
+	
+	public String getDescription(){return description;}
+	
+	public int getGridHeight(){return gridHeight;}
+	
+	public int getGridWidth(){return gridWidth;}
+	public String getInputString(){return whatAmI;}
+	public Vector2 getLocation(){return location;}
+	public String getOwner(){return owner;}
+	public Texture getTexture(){return img;}
+	public Boolean getTrading(){return trading;}
+	public int getValue(){return value;}
+	public void handleInteraction(Circle interactCircle)
+	{
+		//System.out.println("Handling interaction");
+		if(Intersector.overlaps(interactCircle, collisionShape))
+		{
+			System.out.println(description);
+		}
+	} 
 	public void itemSetup(String inputString)
 	{
 		reader = new XmlReader();
@@ -73,26 +94,9 @@ public class Item {
 		gridHeight = Integer.parseInt(thisItem.getAttribute("gridHeight"));
 		gridWidth = Integer.parseInt(thisItem.getAttribute("gridWidth"));
 	}
-	
 	public void setCollision(Texture inputImg){collisionShape = new Rectangle(location.x, location.y, inputImg.getWidth(), inputImg.getHeight());}
 	
-	public void handleInteraction(Circle interactCircle)
-	{
-		//System.out.println("Handling interaction");
-		if(Intersector.overlaps(interactCircle, collisionShape))
-		{
-			System.out.println(description);
-		}
-	}
-	
-	public Texture getTexture(){return img;}
-	public Vector2 getLocation(){return location;}
-	public Rectangle getCollisionShape(){return collisionShape;}
-	public String getDescription(){return description;}
-	public String getInputString(){return whatAmI;}
-	public int getValue(){return value;}
 	public void setOwner(String inputOwner){owner = inputOwner;}
-	public String getOwner(){return owner;} 
 	public void setTrading()
 	{
 		if(trading)
@@ -100,9 +104,5 @@ public class Item {
 		else
 			trading = true;
 	}
-	public Boolean getTrading(){return trading;}
-	
-	public int getGridHeight(){return gridHeight;}
-	public int getGridWidth(){return gridWidth;}
 	
 }

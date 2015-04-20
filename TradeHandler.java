@@ -39,11 +39,14 @@ public class TradeHandler{
 		tradeInventory = new InventoryManager(this);
 	}
 	
-	public void Update()
+	public Boolean checkPrices()
 	{
-		playerInventoryCopy.update();
-		entityInventoryCopy.update();
-		tradeInventory.update();			
+		//If the value of the items the player is submitting is higher than the entity's
+		if(getPlayerTotal() >= getEntityTotal())
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	public void concludeTrade()
@@ -60,56 +63,27 @@ public class TradeHandler{
 		//tradeSetup = false;
 	}
 	
-	public void setTrading(Boolean inputBoolean){trading = inputBoolean;}
-	public Boolean getTrading(){return trading;}
-	public Boolean getGoodTrade(){return goodTrade;}
-	public BitmapFont getFont(){return font;}
-	public InventoryManager getPICopy(){return playerInventoryCopy;}
-	public InventoryManager getEICopy(){return entityInventoryCopy;}
-	public InventoryManager getPBCopy(){return tradeInventory;}
-	public Entity getCurrentEntity(){return currentEntity;}
-	public Cursor getMainCursor(){return playerInventoryCopy.getCursor();}
-	
-	public void tryTrade()
+	public void draw()
 	{
-		if(checkPrices())
+		
+		if(entityInventoryCopy.getReady())
 		{
-			exchangeGoods();
-			concludeTrade();
+			entityInventoryCopy.draw();			
 		}
-	}
-	
-	public Boolean checkPrices()
-	{
-		int playerTotal = 0;
-		int entityTotal = 0;
-		for(int row = 0; row < playerInventoryCopy.gridHeight; row++)
+
+		if(tradeInventory.getReady())
 		{
-			for(int col = 0; col < playerInventoryCopy.gridWidth; col++)
-			{
-				//If the item in the slot is marked for trading
-				if(tradeInventory.getGrid()[row][col].getCurrentItem() != null)
-				{
-					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "player")
-					{
-						playerTotal += tradeInventory.getGrid()[row][col].getCurrentItem().getValue();
-					}
-					else 
-					{
-						entityTotal += tradeInventory.getGrid()[row][col].getCurrentItem().getValue();
-					}
-				}
-			}
+			tradeInventory.draw();
 		}
-		if(playerTotal >= entityTotal)
+		
+		if(playerInventoryCopy.getReady())
 		{
-			return true;
+			playerInventoryCopy.draw();
 		}
-		return false;
+		
 
 		
 	}
-
 	public void exchangeGoods()
 	{
 		for(int row = 0; row < playerInventoryCopy.gridHeight; row++)
@@ -143,25 +117,75 @@ public class TradeHandler{
 			}
 		}
 	}
-	
-	public void draw()
+	public Entity getCurrentEntity(){return currentEntity;}
+	public InventoryManager getEICopy(){return entityInventoryCopy;}
+	public int getEntityTotal()
 	{
-		
-		if(entityInventoryCopy.getReady())
+		int entityTotal = 0;
+		for(int row = 0; row < tradeInventory.gridHeight; row++)
 		{
-			entityInventoryCopy.draw();			
+			for(int col = 0; col < tradeInventory.gridWidth; col++)
+			{
+				//If the item in the slot is marked for trading
+				if(tradeInventory.getGrid()[row][col].getCurrentItem() != null)
+				{
+					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "player")
+					{
+					}
+					else 
+					{
+						entityTotal += tradeInventory.getGrid()[row][col].getCurrentItem().getValue();
+					}
+				}
+			}
 		}
+		return entityTotal;
+	}
+	public BitmapFont getFont(){return font;}
+	public Boolean getGoodTrade(){return goodTrade;}
+	public Cursor getMainCursor(){return playerInventoryCopy.getCursor();}
+	public InventoryManager getPBCopy(){return tradeInventory;}
+	
+	public InventoryManager getPICopy(){return playerInventoryCopy;}
+	
+	public int getPlayerTotal()
+	{
+		int playerTotal = 0;
+		for(int row = 0; row < tradeInventory.gridHeight; row++)
+		{
+			for(int col = 0; col < tradeInventory.gridWidth; col++)
+			{
+				//If the item in the slot is marked for trading
+				if(tradeInventory.getGrid()[row][col].getCurrentItem() != null)
+				{
+					if(tradeInventory.getGrid()[row][col].getCurrentItem().getOwner() == "player")
+					{
+						playerTotal += tradeInventory.getGrid()[row][col].getCurrentItem().getValue();
+					}
+				}
+			}
+		}
+		return playerTotal;
+	}
+	
+	public Boolean getTrading(){return trading;}
+	
+	public void setTrading(Boolean inputBoolean){trading = inputBoolean;}
 
-		if(tradeInventory.getReady())
+	public void tryTrade()
+	{
+		if(checkPrices())
 		{
-			tradeInventory.draw();
+			exchangeGoods();
+			concludeTrade();
 		}
-		
-		if(playerInventoryCopy.getReady())
-		{
-			playerInventoryCopy.draw();
-		}
-		
+	}
+	
+	public void Update()
+	{
+		playerInventoryCopy.update();
+		entityInventoryCopy.update();
+		tradeInventory.update();			
 	}
 	
 	

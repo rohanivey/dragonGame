@@ -22,16 +22,11 @@ public class Cursor {
 		
 	}
 	
-	public void update()
+	public void checkInput(){}
+	
+	public void defaultTexture()
 	{
-		tempX = Gdx.input.getX();
-		tempY = Gdx.input.getY();
-		
-		tempY = Gdx.graphics.getHeight() - tempY;
-
-		
-		sprite.setX(tempX);
-		sprite.setY(tempY);
+		sprite.setRegion(img);
 	}
 	
 	public void draw()
@@ -41,15 +36,20 @@ public class Cursor {
 		sb.end();
 	}
 	
-	public void checkInput(){}
+	public Item getItem(){return heldItem;}
+	
+	public Sprite getSprite(){return sprite;}
 	
 	public void onClick(){}
 	
-	public Item getItem(){return heldItem;}
-	
 	public void setItem(Item inputItem){heldItem = inputItem;}
 	
-	public Sprite getSprite(){return sprite;}
+	public void setTexture()
+	{
+		//TODO: Find some way to get a copy of a texture so I can break links if need be
+		tempImg = heldItem.getTexture();
+		sprite.setRegion(tempImg);
+	}
 	
 	public void swapItem(Slot inputSlot)
 	{
@@ -63,23 +63,6 @@ public class Cursor {
 		heldItem = tempItem;
 		setTexture();
 		
-	}
-	
-	public Boolean testSwap(Slot inputSlot)
-	{
-		//Make a copy of everything involved so I don't mishandle an object
-		InventoryManager tempIM = inputSlot.getIM().copyMe(); 
-		Slot[][] tempGrid = tempIM.getGrid();
-		Slot tempSlot = tempGrid[inputSlot.getRow()][inputSlot.getCol()];
-
-		
-		//Play with the copies
-		tempIM.removeItem(tempSlot);
-		if(tempIM.checkGridRoom(heldItem, tempSlot.getRow(), tempSlot.getCol()))
-		{
-			return true;
-		}
-		return false;
 	}
 	
 	public Boolean testOwner(Slot inputSlot)
@@ -104,17 +87,34 @@ public class Cursor {
 	}
 	
 	
-	public void setTexture()
+	public Boolean testSwap(Slot inputSlot)
 	{
-		//TODO: Find some way to get a copy of a texture so I can break links if need be
-		tempImg = heldItem.getTexture();
-		sprite.setRegion(tempImg);
+		//Make a copy of everything involved so I don't mishandle an object
+		InventoryManager tempIM = inputSlot.getIM().copyMe(); 
+		Slot[][] tempGrid = tempIM.getGrid();
+		Slot tempSlot = tempGrid[inputSlot.getRow()][inputSlot.getCol()];
+
+		
+		//Play with the copies
+		tempIM.removeItem(tempSlot);
+		if(tempIM.checkGridRoom(heldItem, tempSlot.getRow(), tempSlot.getCol()))
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	
-	public void defaultTexture()
+	public void update()
 	{
-		sprite.setRegion(img);
+		tempX = Gdx.input.getX();
+		tempY = Gdx.input.getY();
+		
+		tempY = Gdx.graphics.getHeight() - tempY;
+
+		
+		sprite.setX(tempX);
+		sprite.setY(tempY);
 	}
 	
 }

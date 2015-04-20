@@ -23,24 +23,13 @@ public class Dog extends Entity{
 		return img;
 	}
 	
-	public void setupTrade()
-	{
-		im = new InventoryManager(this);
-		im.addItem(new Item("Dagger", myName));
-		im.addItem(new Item("Dagger", myName));
-		im.addItem(new Item("Shield", myName));
-		im.addItem(new Item("Shield", myName));
-		im.addItem(new Item("Shield", myName));
-		im.addItem(new Item("DonkHammer", myName));
-	}
-	
-
-
 	@Override
 	public TextureRegion getTextureRegion() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+
 
 	@Override
 	public void interact() {
@@ -55,6 +44,17 @@ public class Dog extends Entity{
 		
 
 		
+	}
+
+	public void setupTrade()
+	{
+		im = new InventoryManager(this);
+		im.addItem(new Item("Dagger", myName));
+		im.addItem(new Item("Dagger", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("DonkHammer", myName));
 	}
 
 	

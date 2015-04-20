@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Slot {
 
+	enum slotType  
+		{
+			MASTER, SLAVE, UNUSED
+		}
 	private Item currentItem;
 	private Slot masterSlot;
 	private InventoryManager myIM;
@@ -15,14 +19,10 @@ public class Slot {
 	private int slotWidth = img.getWidth();
 	private int slotHeight = img.getHeight();
 	private float clickCooldown = 0.2f;
+	
 	private ArrayList<Slot> slaveList;
 	
 	private slotType currentType = slotType.UNUSED;
-	
-	enum slotType  
-		{
-			MASTER, SLAVE, UNUSED
-		}
 	
 	public Slot(InventoryManager inputIM,int inputRow,int inputCol, int inputX, int inputY)
 	{
@@ -36,21 +36,9 @@ public class Slot {
 		slaveList = new ArrayList<Slot>();
 	}
 	
-	public void update()
+	public void addSlave(Slot inputSlot)
 	{
-		clickCooldown -= Gdx.graphics.getDeltaTime();
-		//System.out.println(clickCooldown);
-		if( (clickCooldown <= 0) & (Gdx.input.isTouched()) )
-		{
-			clickCooldown = 0.2f;
-			//System.out.println("The player has clicked");
-			if(checkCoords())
-			{
-				System.out.println("The player has clicked within a slot's bounds");
-				System.out.println("Width: " + widthLoc + " Height: " + heightLoc);
-				checkType();				
-			}
-		}
+		slaveList.add(inputSlot);
 	}
 	
 	public Boolean checkCoords()
@@ -69,6 +57,26 @@ public class Slot {
 		}
 		
 		return false;
+	}
+	
+	public void checkMasterInput()
+	{
+		//If the master slot is touched
+		if(Gdx.input.isTouched())
+		{
+			touchMaster();
+			System.out.println("Touching master through slave slot in Slot.checkMasterInput()");
+		}
+	}
+	
+	public void checkSlaveInput()
+	{
+		//If the slave slot is touched
+		if(Gdx.input.isTouched())
+		{
+			//Make its master update touch
+			masterSlot.touchMaster();
+		}
 	}
 	
 	public void checkType()
@@ -90,103 +98,6 @@ public class Slot {
 		}
 	}
 	
-	public void setItem(Item inputItem)
-	{
-		//System.out.println("Setting item in Slot.setItem()");
-		currentItem = inputItem;
-	}
-	
-	public void setType(String inputType)
-	{
-		switch(inputType)
-		{
-		case "MASTER":
-			//Make a new ArrayList of Slots
-			slaveList = new ArrayList<Slot>();
-			//Set this type to MASTER
-			currentType = slotType.MASTER;
-			//System.out.println("Setting type to MASTER in Slot.setType()");
-			break;
-		case "SLAVE":
-			currentType = slotType.SLAVE;
-			//System.out.println("Setting type to SLAVE in Slot.setType()");
-			break;
-		case "UNUSED":
-			//System.out.println("Setting type to UNUSED in Slot.setType()");
-			if(slaveList != null)
-			{
-				//System.out.println("Slave list is > 0 in Slot.setType()");
-				for(Slot s: slaveList)
-				{
-					s.forceType("UNUSED");
-				}
-				//System.out.println("Setting slave list to null in Slot.setType()");
-				slaveList = null;
-			}
-			forceType("UNUSED");
-			currentItem = null;
-			break;
-		
-		}
-	}
-	
-	public void setMaster(Slot inputSlot)
-	{
-		masterSlot = inputSlot;
-	}
-	
-	public Slot getMasterSlot(){return masterSlot;}
-	public Item getCurrentItem(){return currentItem;}
-	public String getCurrentType(){return currentType.toString();}
-	public InventoryManager getIM(){return myIM;}
-	public int getRow(){return heightLoc;}
-	public int getCol(){return widthLoc;}
-	
-	public void checkMasterInput()
-	{
-		//If the master slot is touched
-		if(Gdx.input.isTouched())
-		{
-			touchMaster();
-			System.out.println("Touching master through slave slot in Slot.checkMasterInput()");
-		}
-	}
-	
-	public void touchMaster()
-	{
-		System.out.println("Checking state input in Slot.touchMaster()");
-		//If the cursor has no item in hand
-		if(myIM.getCursor().getItem() == null)
-		{
-			//System.out.println("Cursor has no item, adjusting slot in Slot.touchMaster()");
-			//Give it this slot's current item
-			myIM.getCursor().setItem(currentItem);
-			//Set the cursor as the item in question's texture
-			myIM.getCursor().setTexture();
-			//Set this slot and all slaves to unused again
-			setType("UNUSED");
-		}
-		else if(myIM.getCursor().getItem() != null && myIM.getCursor().testOwner(this))
-		{
-			//System.out.println("Cursor has an item, however there is already an item in Slot at Slot.touchMaster()");
-			if(myIM.getCursor().testSwap(this))
-			{
-				myIM.getCursor().swapItem(this);				
-			}
-		}
-
-	}
-	
-
-	public void checkSlaveInput()
-	{
-		//If the slave slot is touched
-		if(Gdx.input.isTouched())
-		{
-			//Make its master update touch
-			masterSlot.touchMaster();
-		}
-	}
 	public void checkUnusedInput()
 	{
 		//If the unused slot is touched
@@ -235,12 +146,6 @@ public class Slot {
 				break;
 		}
 	}
-	
-	public void addSlave(Slot inputSlot)
-	{
-		slaveList.add(inputSlot);
-	}
-	
 	public void forceType(String inputString)
 	{
 		switch(inputString)
@@ -255,6 +160,101 @@ public class Slot {
 			currentType = slotType.UNUSED;
 			System.out.println("Current Slot type forced to UNUSED inside Slot.forceType()");
 			break;
+		}
+	}
+	public int getCol(){return widthLoc;}
+	public Item getCurrentItem(){return currentItem;}
+	public String getCurrentType(){return currentType.toString();}
+	public InventoryManager getIM(){return myIM;}
+	
+	public Slot getMasterSlot(){return masterSlot;}
+	
+	public int getRow(){return heightLoc;}
+	
+
+	public void setItem(Item inputItem)
+	{
+		//System.out.println("Setting item in Slot.setItem()");
+		currentItem = inputItem;
+	}
+	public void setMaster(Slot inputSlot)
+	{
+		masterSlot = inputSlot;
+	}
+	
+	public void setType(String inputType)
+	{
+		switch(inputType)
+		{
+		case "MASTER":
+			//Make a new ArrayList of Slots
+			slaveList = new ArrayList<Slot>();
+			//Set this type to MASTER
+			currentType = slotType.MASTER;
+			//System.out.println("Setting type to MASTER in Slot.setType()");
+			break;
+		case "SLAVE":
+			currentType = slotType.SLAVE;
+			//System.out.println("Setting type to SLAVE in Slot.setType()");
+			break;
+		case "UNUSED":
+			//System.out.println("Setting type to UNUSED in Slot.setType()");
+			if(slaveList != null)
+			{
+				//System.out.println("Slave list is > 0 in Slot.setType()");
+				for(Slot s: slaveList)
+				{
+					s.forceType("UNUSED");
+				}
+				//System.out.println("Setting slave list to null in Slot.setType()");
+				slaveList = null;
+			}
+			forceType("UNUSED");
+			currentItem = null;
+			break;
+		
+		}
+	}
+	
+	public void touchMaster()
+	{
+		System.out.println("Checking state input in Slot.touchMaster()");
+		//If the cursor has no item in hand
+		if(myIM.getCursor().getItem() == null)
+		{
+			//System.out.println("Cursor has no item, adjusting slot in Slot.touchMaster()");
+			//Give it this slot's current item
+			myIM.getCursor().setItem(currentItem);
+			//Set the cursor as the item in question's texture
+			myIM.getCursor().setTexture();
+			//Set this slot and all slaves to unused again
+			setType("UNUSED");
+		}
+		else if(myIM.getCursor().getItem() != null && myIM.getCursor().testOwner(this))
+		{
+			//System.out.println("Cursor has an item, however there is already an item in Slot at Slot.touchMaster()");
+			if(myIM.getCursor().testSwap(this))
+			{
+				myIM.getCursor().swapItem(this);				
+			}
+		}
+
+	}
+	
+	public void update()
+	{
+		clickCooldown -= Gdx.graphics.getDeltaTime();
+		//System.out.println(clickCooldown);
+		if( (clickCooldown <= 0) & (Gdx.input.isTouched()) )
+		{
+			clickCooldown = 0.2f;
+			//System.out.println("The player has clicked");
+			if(checkCoords())
+			{
+				System.out.println("The player has clicked within a slot's bounds");
+				System.out.println("Width: " + widthLoc + " Height: " + heightLoc);
+				checkType();				
+			}
 		}
 	}
 	
