@@ -9,13 +9,11 @@ public class Dog extends Entity{
 	Texture img = new Texture("dog.png");
 
 	
-	Dog(int inputX, int inputY, Player inputPlayer, MainState inputMainState) {
+	Dog(int inputX, int inputY, Player inputPlayer, MainState inputMainState)
+	{
 		super(inputX, inputY, inputPlayer, "dog", inputMainState);
 		setCollision(img);
 		type = Type.Neutral;
-		inventory.add(new Item("Dagger"));
-		inventory.add(new Item("Shield"));
-		inventory.add(new Item("Dagger"));
 	}
 	
 	public Texture Draw(){return img;}
@@ -23,6 +21,17 @@ public class Dog extends Entity{
 	@Override
 	public Texture getTexture() {
 		return img;
+	}
+	
+	public void setupTrade()
+	{
+		im = new InventoryManager(this);
+		im.addItem(new Item("Dagger", myName));
+		im.addItem(new Item("Dagger", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("DonkHammer", myName));
 	}
 	
 

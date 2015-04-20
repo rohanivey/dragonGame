@@ -1,7 +1,5 @@
 package com.rohan.dragonGame;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,7 +26,7 @@ public abstract class Entity {
 	ShapeRenderer sr;
 	String[][] pKnowCopy;
 	String myName;
-	ArrayList<Item> inventory; 
+	InventoryManager im;
 	
 	enum Type
 	{
@@ -47,10 +45,6 @@ public abstract class Entity {
 		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height - chatFont.getLineHeight());
 		sr = new ShapeRenderer();
 		myName = inputName;
-		inventory = new ArrayList<Item>();
-
-
-
 	}
 	
 	public void update()
@@ -64,7 +58,7 @@ public abstract class Entity {
 	public abstract TextureRegion getTextureRegion();
 	public float getX(){return location.x;}
 	public float getY(){return location.y;}
-	public ArrayList<Item> getInventory(){return inventory;}
+	public InventoryManager getInventoryManager(){return im;}
 	
 	public void handleCollision(Player player)
 	{
@@ -136,13 +130,9 @@ public abstract class Entity {
 		
 		public String getName(){return myName;}
 		
-		public void inputNewInventory(ArrayList<Item> inputInventory)
+		public void setupTrade()
 		{
-			inventory = new ArrayList<Item>();
-			for(Item i : inputInventory)
-			{
-				inventory.add(i);
-			}
+			im = new InventoryManager(this);
 		}
 
 

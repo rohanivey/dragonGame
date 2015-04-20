@@ -1,6 +1,5 @@
 package com.rohan.dragonGame;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
@@ -54,7 +53,6 @@ public class Player{
 	private String[][] characterKnowledge;
 	private Boolean foundName;
 	
-	private ArrayList<Item> itemsInInventory;
 	private TradeHandler th;
 	private Boolean tradeSetup = false;
 	
@@ -128,9 +126,6 @@ public class Player{
 		characterKnowledge = new String[1000][100];
 		characterKnowledge[0][0] = "thyself";
 		
-		itemsInInventory = new ArrayList<Item>();
-		
-		
 		str = 5;
 		wis = 3;
 		intel = 0;
@@ -173,10 +168,11 @@ public class Player{
 					Item i = iterator.next();
 					if(Intersector.overlaps(interactCircle, i.getCollisionShape()))
 					{
-						if(im.pickUpItem(i))
+						if(im.addItem(i))
 						{
 							System.out.println("Item added successfully");
 							iterator.remove();
+							i.setOwner("PLAYER");
 							//itemsInInventory.add(i);
 						}
 						else
@@ -428,38 +424,29 @@ public class Player{
 	
 	public void setupTrading()
 	{
-		System.out.println("Setting up trading system in player setupTrading()");
-		th = new TradeHandler(itemsInInventory, activeEntity.getInventory());
-		tradeSetup = true;
+		if(!tradeSetup)
+		{
+			System.out.println("Setting up trading system in player setupTrading()");
+			th = new TradeHandler(this, activeEntity);
+			tradeSetup = true;
+		}
+		else if (tradeSetup)
+		{
+			th = null;
+			tradeSetup = false;
+		}
 	}
 	
 	public void checkTrading()
 	{
-		//If the trade handler isn't setup, do so now
-		if(!tradeSetup){setupTrading();System.out.println("setupTrading() complete");}
-		//If the trade is good get the updated inventory lists and hook up the player and entity with the new inventories
-		if(th.getGoodTrade())
-		{
-			itemsInInventory = new ArrayList<Item>();
-			for(Item i : th.getPICopy())
-			{
-				itemsInInventory.add(i);
-			}
-			//Set up the entity with post trade inventory copy, it'll set up its inv on its own side
-			activeEntity.inputNewInventory(th.getEICopy());
-			//Tell the entity it's no longer trading
-			activeEntity.getDialogueHandler().setTrading(false);
-			//Tell the player to go back to chat menu
-			currentState = State.Chatting;
-			//Declare there is no longer a chat set up
-			tradeSetup = false;
-		}
-		//update the trade handler
-		if(th.getTrading())
+		if(tradeSetup)
 		{
 			th.Update();
 		}
-
+		else
+		{
+			setupTrading();
+		}
 	}	
 	
 	public void checkChatting()
@@ -659,6 +646,7 @@ public class Player{
 	{
 		return chatSelection;
 	}
+	
 	
 	public TradeHandler getTradeHandler(){return th;}
 	public Boolean getTradeSetup(){return tradeSetup;}

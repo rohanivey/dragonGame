@@ -1,12 +1,9 @@
 package com.rohan.dragonGame;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,7 +15,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.rohan.dragonGame.Player.State;
@@ -33,8 +29,6 @@ public class MainState extends GameState{
 	private ArrayList<TiledMap> level;
 
 	private SpriteBatch sb;
-	private SpriteBatch hud;
-	private BitmapFont hudFont;
 	private TiledMap map;
 	private TiledMapTileLayer bg;
 	private TiledMapTileLayer fg;
@@ -61,10 +55,10 @@ public class MainState extends GameState{
 	{
 		ms = this;
 		sb = new SpriteBatch();
-		hud = new SpriteBatch();
+		
 		cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		hudCam = new OrthographicCamera(cam.viewportWidth, cam.viewportHeight);
-		hudFont = new BitmapFont();
+		
 		paused = false;
 		
 		critters = new ArrayList<Entity>();
@@ -80,21 +74,22 @@ public class MainState extends GameState{
 		//Music
 		carnivalMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/carnivalrides.ogg"));
 		carnivalMusic.setVolume(0.0f);
-		carnivalMusic.setLooping(true);
+		//carnivalMusic.setLooping(true);
 		
 		player = new Player(30, 30, ms);
 		Entity testDog = new Dog(90, 90, player, ms);
 		addEntity(testDog);
+		startMusic();
 		
 		//Inventory stuff
 		
-		Item testItem = new Item("Dagger", 220, 90);
+		Item testItem = new Item("Dagger", "none", 220, 90);
 		itemsOnScreen.add(testItem);
-		Item testItem2 = new Item("Shield", 150, 90);
+		Item testItem2 = new Item("Shield", "none", 150, 90);
 		itemsOnScreen.add(testItem2);
-		Item testItem3 = new Item("DonkHammer", 360, 70);
+		Item testItem3 = new Item("DonkHammer", "none", 360, 70);
 		itemsOnScreen.add(testItem3);
-		Item testItem4 = new Item("Dagger", 490, 90);
+		Item testItem4 = new Item("Dagger", "none", 490, 90);
 		itemsOnScreen.add(testItem4);
 
 		chatBox = new Rectangle(0,0,ms.getCamera().viewportWidth, ms.getCamera().viewportHeight/4);
@@ -170,9 +165,6 @@ public class MainState extends GameState{
 			}
 		}
 		
-		//TODO FIGURE OUT IF I STILL NEED THIS
-		int[] backgroundLayers = {0};
-		int[] overheadLayers = {1};
 		return tileMap;
 	}
 	
@@ -187,6 +179,7 @@ public class MainState extends GameState{
 	
 	public void cameraHandler()
 	{
+		
 		cam.position.set(player.getX() + player.getTextureRegion().getRegionWidth()/2, player.getY() + player.getTextureRegion().getRegionHeight()/2, 0);
 		if(cam.position.x < 0 + cam.viewportWidth/2){cam.position.x = cam.viewportWidth/2; }
 		if(cam.position.x > (level.get(0).getProperties().get("width", Integer.class) * level.get(0).getProperties().get("tilewidth", Integer.class)) - cam.viewportWidth/2){cam.position.x = (level.get(0).getProperties().get("width", Integer.class) * level.get(0).getProperties().get("tilewidth", Integer.class)) - cam.viewportWidth/2;}
@@ -275,6 +268,7 @@ public class MainState extends GameState{
 		
 		if(player.getState() == State.Trading && player.getTradeSetup())
 		{
+			/*
 			Rectangle vertRect = new Rectangle(0,cam.viewportHeight/4,cam.viewportWidth, cam.viewportHeight - cam.viewportHeight/4);
 			Rectangle horRect = new Rectangle(0,0, cam.viewportWidth, cam.viewportHeight * 0.25f);
 			sr.setProjectionMatrix(cam.combined);
@@ -287,6 +281,9 @@ public class MainState extends GameState{
 			sr.line(vertRect.width/2, vertRect.y, vertRect.width/2, vertRect.y + vertRect.height);
 			sr.line(0, horRect.height, horRect.width, horRect.height);
 			Vector2 cir = new Vector2(1,1);
+			*/
+			
+			/*
 			switch(player.getTradeHandler().getCurrentList())
 			{
 			case "Player":
@@ -369,6 +366,8 @@ public class MainState extends GameState{
 			
 			
 			sb.end();
+			*/
+			player.getTradeHandler().draw();
 		}
 		
 		if(player.getState() == State.Inventory)

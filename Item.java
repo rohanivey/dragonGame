@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.XmlReader.Element;
 
 public class Item {
 
-	private String id;
+	//private String id;
 	private String description;
 	private XmlReader reader;
 	private Element root;
@@ -24,20 +24,23 @@ public class Item {
 	private String whatAmI;
 	private int value;
 	private Boolean trading = false;
+	private String owner;
 	
 	
 	private int gridHeight = 0;
 	private int gridWidth = 0;
 	
 	
-	public Item(String inputString)
+	public Item(String inputString, String inputOwner)
 	{
+		owner = inputOwner;
 		whatAmI = inputString;
 		itemSetup(inputString);
 	}
 	
-	public Item(String inputString, int inputX, int inputY)
+	public Item(String inputString, String inputOwner, int inputX, int inputY)
 	{
+		owner = inputOwner;
 		whatAmI = inputString;
 		itemSetup(inputString);
 		
@@ -46,6 +49,11 @@ public class Item {
 		setCollision(img);
 	}	
 	
+	public Item copyMe()
+	{
+		Item tempItem = new Item(whatAmI, owner);
+		return tempItem;
+	}
 	
 	public void itemSetup(String inputString)
 	{
@@ -58,7 +66,7 @@ public class Item {
 			System.out.println("GOOFED UP DAT ITEM LIST HONKA!");
 		}
 		thisItem = root.getChildByName(inputString);		
-		id = thisItem.getAttribute("id");
+		//id = thisItem.getAttribute("id");
 		description = thisItem.getAttribute("description", "NO DESCRIPTION SET!");
 		img = new Texture(Gdx.files.internal(thisItem.getAttribute("sprite")));
 		value = Integer.parseInt(thisItem.getAttribute("initialValue"));
@@ -83,6 +91,8 @@ public class Item {
 	public String getDescription(){return description;}
 	public String getInputString(){return whatAmI;}
 	public int getValue(){return value;}
+	public void setOwner(String inputOwner){owner = inputOwner;}
+	public String getOwner(){return owner;} 
 	public void setTrading()
 	{
 		if(trading)

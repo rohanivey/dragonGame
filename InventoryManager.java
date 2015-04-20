@@ -1,5 +1,6 @@
 package com.rohan.dragonGame;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
@@ -13,45 +14,113 @@ public class InventoryManager {
 	int playerIntel;
 	int gridHeight;
 	int gridWidth;
+	int startingX;
+	int startingY;
 	SpriteBatch sb;
+	private ownerType type;
+	Boolean readyToDraw = false;
 	
 	private Slot[][] grid; 
 	
+	enum ownerType {PLAYER, ENTITY, TRADE}
+	
 	public InventoryManager(Player inputPlayer)
 	{
+		System.out.println("Setting up the Inventory Manager for the player in the InventoryManager constructor");
 		player = inputPlayer;
+		
+		type = ownerType.PLAYER;
+		
 		playerStr = player.getStats("str");
 		playerWis = player.getStats("wis");
 		playerIntel = player.getStats("intel");
 		
-
-		//WARNING: These are inverted
 		//I'm certain there is a very simple solution to this problem
 		//But I'm running low on coffee and the Red Cross won't consider that an official 'disaster'
 		gridHeight = playerStr;  
-		gridWidth = playerWis+playerIntel/2; 
+		gridWidth = playerWis+playerIntel/2;
+		
+		startingX = Gdx.graphics.getWidth()/10;
+		startingY = Gdx.graphics.getHeight()/2;
 		
 		sb = new SpriteBatch();
 		cursor = new Cursor(this);
 		
-		
-		//Establish grid size/bounds
-		grid = new Slot[gridHeight][gridWidth];
-		//FILL UP DAT GRID SUCKA
-		for(int row = 0; row < gridHeight; row++)
-		{
-			for(int col = 0; col < gridWidth; col++ )
-			{
-				slot = new Slot(this, row, col);
-				grid[row][col] = slot;
-				System.out.println("Adding new slot at location:[" + row + ", " + col + "]");
-			}
-		}
+		grid = setupGrid();
+		readyToDraw = true;
 	}
-
+	
+	public InventoryManager(Entity inputEntity)
+	{
+		System.out.println("Setting up the Inventory Manager for an entity in the InventoryManager constructor");
+		type = ownerType.ENTITY;
+		gridHeight = 10;
+		gridWidth = 8;
+		startingX = Gdx.graphics.getWidth()/2;
+		startingY = Gdx.graphics.getHeight()/2;
+		
+		sb = new SpriteBatch();
+		cursor = inputEntity.p.getInventoryManager().getCursor();
+		
+		grid = setupGrid();
+		readyToDraw = true;
+	}
+	
+	@SuppressWarnings("unused")
+	public InventoryManager(TradeHandler inputTH)
+	{
+		System.out.println("Setting up the Inventory Manager for the Tradehandler in the InventoryManager constructor");
+		type = ownerType.TRADE;
+		TradeHandler th = inputTH;
+		gridHeight = 6;
+		gridWidth = 8;
+		startingX = Gdx.graphics.getWidth()/3;
+		startingY = Gdx.graphics.getHeight()/10;
+		grid = setupGrid();
+		sb = new SpriteBatch();
+		cursor = inputTH.getMainCursor();
+		readyToDraw = true;
+	}
+	
+	public InventoryManager(int inputGH, int inputGW, int inputSX, int inputSY, Slot[][] originalGrid, ownerType inputType, Cursor inputCursor)
+	{
+		gridHeight = inputGH;
+		gridWidth = inputGW;
+		startingX = inputSX;
+		startingY = inputSY;
+		type = inputType;
+		sb = new SpriteBatch();
+		cursor = inputCursor;
+		grid = setupGrid();
+		copyGrid(grid, originalGrid);
+		readyToDraw = true;
+	}
+	
 	public void update()
 	{
-		cursor.update();
+		//No matter what the grid needs to update
+		gridUpdate();
+		switch(type)
+		{
+		case PLAYER:
+			//The player cursor will always be present. There won't be a cursor without a player.
+			cursor.update();
+			break;
+		case ENTITY:
+			//Use trade handler to do stuff, get cursor
+			
+			break;
+		case TRADE:
+			//Use trade handler to do stuff, get cursor
+			
+			break;
+		default:
+			break;
+		}
+	}
+	
+	public void gridUpdate()
+	{
 		for(int row = 0; row < gridHeight; row++)
 		{
 			for(int col = 0; col < gridWidth; col++)
@@ -63,8 +132,66 @@ public class InventoryManager {
 	}
 	
 	public Cursor getCursor(){return cursor;}
+	public Slot[][] getGrid(){return grid;}
+	public ownerType getType()
+	{
+		return type;
+	}
+	public InventoryManager copyMe()
+	{
+		System.out.println("Entity type" + type.toString() + "has called for InventoryManager.CopyMe()");
+		return new InventoryManager(gridHeight, gridWidth, startingX, startingY, grid, type, cursor);
+	}
 	
-	public Boolean pickUpItem(Item inputItem)
+	public Boolean getReady()
+	{
+		return readyToDraw;
+	}
+	
+	public Slot[][] copyGrid(Slot[][] gridToWrite, Slot[][] gridToRead)
+	{
+		System.out.println("Copying grid to safe play grid in InventoryManager.copyGrid()");
+		Slot[][] tempGrid = gridToWrite;
+		for(int row = 0; row < gridToRead.length; row++)
+		{
+			for(int col = 0; col < gridToRead[row].length; col++ )
+			{
+				if(gridToRead[row][col].getCurrentItem() != null)
+				{
+					tempGrid[row][col].setItem(gridToRead[row][col].getCurrentItem().copyMe());
+					//Need to tell the slot to become a master and tell this im that the new slots around it are slaves
+					tempGrid[row][col].setType("MASTER");
+					//Enslave the slots for this item
+					//System.out.println("Enslaving slots in InventoryManager.pickUpItem");
+					enslaveSlots(tempGrid[row][col].getCurrentItem(), row, col);
+					//System.out.println("Adding copied item " + tempGrid[row][col].getCurrentItem().getInputString()+ " at location:[" + row + ", " + col + "]");
+				}
+
+			}
+		}
+		//System.out.println("Returning temp grid in InventoryManager.copyGrid()");
+		return tempGrid;
+	}
+
+	public Slot[][] setupGrid()
+	{
+		//Establish grid size/bounds
+		grid = new Slot[gridHeight][gridWidth];
+		//FILL UP DAT GRID SUCKA
+		for(int row = 0; row < gridHeight; row++)
+		{
+			for(int col = 0; col < gridWidth; col++ )
+			{
+				slot = new Slot(this, row, col, startingX, startingY);
+				grid[row][col] = slot;
+				System.out.println("Slot's owner is " + getType().toString());
+				//System.out.println("Adding new slot at location:[" + row + ", " + col + "]");
+			}
+		}
+		return grid;
+	}
+	
+	public Boolean addItem(Item inputItem)
 	{
 		for(int row = 0; row < gridHeight; row++)
 		{
@@ -78,15 +205,16 @@ public class InventoryManager {
 					if(checkGridRoom(inputItem, row, col))
 					{
 						//Set the item for the chosen, approved slot
-						System.out.println("Setting the item in the slot to picked up item in InventoryManager.pickUpItem");
+						//System.out.println("Setting the item in the slot to picked up item in InventoryManager.pickUpItem");
 						grid[row][col].setItem(inputItem);
 						//Tell that slot it is now a master
-						System.out.println("Setting slot to master status in InventoryManager.pickUpItem");
+						//System.out.println("Setting slot to master status in InventoryManager.pickUpItem");
 						grid[row][col].setType("MASTER");
 						//Enslave the slots for this item
-						System.out.println("Enslaving slots in InventoryManager.pickUpItem");
+						//System.out.println("Enslaving slots in InventoryManager.pickUpItem");
 						enslaveSlots(inputItem, row, col);
-						System.out.println("Setting item" + inputItem.getInputString() + " to slot [" + row  + ", " + col + "] in inventoryManager.pickUpItem()");
+						//System.out.println("Setting item" + inputItem.getInputString() + " to slot [" + row  + ", " + col + "] in inventoryManager.addItem()");
+
 						return true;
 					}	
 				}
@@ -95,11 +223,24 @@ public class InventoryManager {
 		return false;
 	}
 	
+	public void addItem(Slot inputSlot, Item inputItem)
+	{
+		grid[inputSlot.getRow()][inputSlot.getCol()].setItem(inputItem);
+		grid[inputSlot.getRow()][inputSlot.getCol()].setType("MASTER");
+		enslaveSlots(inputItem, inputSlot.getRow(),inputSlot.getCol());
+	}
+	
+	public void removeItem(Slot inputSlot)
+	{
+		//Setting the slot to an unused slot allows for handling all the dropping item, setting slot to unused, freeing its slaves, etc
+		inputSlot.setType("UNUSED");
+	}
+	
 	public Boolean checkGridRoom(Item inputItem, int inputRow, int inputCol)
 	{
 		//Check grid size against item size
-		System.out.println("Item " + inputItem.getInputString() + " is " + inputItem.getGridWidth() + " tiles wide and " + inputItem.getGridHeight() + " tiles high.");
-		System.out.println("Grid is beginning at location [" + inputRow + ", " + inputCol + "]");
+		//System.out.println("Item " + inputItem.getInputString() + " is " + inputItem.getGridWidth() + " tiles wide and " + inputItem.getGridHeight() + " tiles high.");
+		//System.out.println("Grid is beginning at location [" + inputRow + ", " + inputCol + "]");
 		int itemHeight = inputRow + inputItem.getGridHeight();
 		int itemWidth = inputCol + inputItem.getGridWidth();
 		int rowClear = 0;
@@ -122,10 +263,10 @@ public class InventoryManager {
 					//If the total check turns out that all dimensions needed are clear, then return true; the item can be added
 					if(rowClear == inputItem.getGridHeight())
 					{
-						System.out.println("Row was clear at " + rowClear + " rows tall clear, checking column");
+						//System.out.println("Row was clear at " + rowClear + " rows tall clear, checking column");
 						if(colClear == inputItem.getGridWidth())
 						{
-							System.out.println("Column was clear at " + colClear + " columns wide clear, returning true");
+							//System.out.println("Column was clear at " + colClear + " columns wide clear, returning true");
 							//If every number has been checked and returned as Unused, then we're all clear and proceed with the process
 							return true;
 						}
@@ -137,7 +278,7 @@ public class InventoryManager {
 			{
 				//If none of the blocks are clear on this row of columns, set rowClear back to 0 to show a break in storage
 				rowClear = 0;
-				System.out.println("Checking next row, col did not return a valid destination for the item.");
+				//System.out.println("Checking next row, col did not return a valid destination for the item.");
 			}
 		}
 
@@ -160,13 +301,13 @@ public class InventoryManager {
 				//TODO: Fix horrendous hack
 				if(i == inputRow && j == inputCol)
 				{
-					System.out.println("Doing nothing at this location");
+					//System.out.println("Doing nothing at this location");
 				}
 				else
 				{
 					grid[i][j].setType("SLAVE");
 					//Debug info
-					System.out.println("The slot at coords " + i + ", " + j + " is now enslaved to slot [" + inputRow + ", " + inputCol + "].");					
+					//System.out.println("The slot at coords " + i + ", " + j + " is now enslaved to slot [" + inputRow + ", " + inputCol + "].");					
 				}
 				//Tell every slot assigned as a slave that its new master slot is at grid inputX, inputY
 				grid[i][j].setMaster(grid[inputRow][inputCol]);
@@ -186,15 +327,23 @@ public class InventoryManager {
 			for(int col = 0; col < gridWidth; col++)
 			{
 				//Draw slot at i,j
-				grid[row][col].draw(row,col);
+				
+				grid[row][col].draw(row, col);
 			}
 		}
+		sb.end();		
+
+		switch(type)
+		{
+		case PLAYER:
+			cursor.draw();
+			break;
+		default:
+			break;
+		}
+
 		
-		//Draw dat mouse cursor
-		cursor.draw();
-		
-		
-		sb.end();
+
 	}
 
 }
