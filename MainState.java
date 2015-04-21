@@ -211,24 +211,25 @@ public class MainState extends GameState{
 			switch(player.getTradeHandler().checkValue())
 			{
 				case "PLAYER":
-					int cost = player.getTradeHandler().getEntityTotal() -  player.getTradeHandler().getPlayerTotal();
-					chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
-					chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
-					chatFont.draw(sb, "Cost: " + cost, 250, 250);
+					int profit = player.getTradeHandler().getPlayerTotal() - player.getTradeHandler().getEntityTotal();
+					chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), player.getTradeHandler().getPICopy().startingX,  player.getTradeHandler().getPICopy().startingY - 64);
+					chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), player.getTradeHandler().getEICopy().startingX, player.getTradeHandler().getEICopy().startingY - 64);
+					chatFont.draw(sb, "Profit: " + profit, player.getTradeHandler().getTrade().x - player.getTradeHandler().getTradeButton().width/2, player.getTradeHandler().getTrade().y);
 					break;
 				case "ENTITY":
-					int profit =  player.getTradeHandler().getEntityTotal() - player.getTradeHandler().getPlayerTotal();
-					chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
-					chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
-					chatFont.draw(sb, "Profit: " + profit, 250, 250);
+					int cost =  player.getTradeHandler().getEntityTotal() - player.getTradeHandler().getPlayerTotal();
+					chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), player.getTradeHandler().getPICopy().startingX,  player.getTradeHandler().getPICopy().startingY - 64);
+					chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), player.getTradeHandler().getEICopy().startingX, player.getTradeHandler().getEICopy().startingY - 64);
+					chatFont.draw(sb, "Cost: " + cost, player.getTradeHandler().getTrade().x - player.getTradeHandler().getTradeButton().width/2, player.getTradeHandler().getTrade().y);
 					break;
 				default:
 					break;
 			}
 			chatFont.draw(sb,  "Trade",  player.getTradeHandler().getTrade().x, player.getTradeHandler().getTrade().y);
-			chatFont.draw(sb, "Player coins: " + String.valueOf(player.getTradeHandler().getPlayerCoins()),  100,  100);
-			chatFont.draw(sb, "Entity coins: " + String.valueOf(player.getTradeHandler().getEntityCoins()),  Gdx.graphics.getWidth() - 100,  100);
-			chatFont.draw(sb, "Trade handler memory address: " + player.getTradeHandler().toString(),  100,  30);
+			//UGH REPLACE THIS WITH METHOD CALLS FOR THE VALUES
+			chatFont.draw(sb, "Player coins: " + String.valueOf(player.getTradeHandler().getPlayerCoins()),  player.getTradeHandler().getPICopy().startingX,  player.getTradeHandler().getPICopy().startingY - 32);
+			chatFont.draw(sb, "Entity coins: " + String.valueOf(player.getTradeHandler().getEntityCoins()),  player.getTradeHandler().getEICopy().startingX, player.getTradeHandler().getEICopy().startingY - 32);
+			//chatFont.draw(sb, "Trade handler memory address: " + player.getTradeHandler().toString(),  100,  30);
 			sb.end();
 		}
 		

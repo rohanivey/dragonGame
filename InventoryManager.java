@@ -30,7 +30,7 @@ public class InventoryManager {
 		type = ownerType.ENTITY;
 		gridHeight = 10;
 		gridWidth = 8;
-		startingX = Gdx.graphics.getWidth()/2;
+		startingX = Gdx.graphics.getWidth() - Gdx.graphics.getWidth()/3;
 		startingY = Gdx.graphics.getHeight()/2;
 		
 		sb = new SpriteBatch();
@@ -70,7 +70,7 @@ public class InventoryManager {
 		gridHeight = playerStr;  
 		gridWidth = playerWis+playerIntel/2;
 		
-		startingX = Gdx.graphics.getWidth()/10;
+		startingX = Gdx.graphics.getWidth()/6;
 		startingY = Gdx.graphics.getHeight()/2;
 		
 		sb = new SpriteBatch();

@@ -1,7 +1,5 @@
 package com.rohan.dragonGame;
 
-import java.util.Arrays;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -39,7 +37,7 @@ public class TradeHandler{
 		tradeButton = new Rectangle();
 		tradeButton.height = 100f;
 		tradeButton.width = 200f;
-		tradeButton.x = Gdx.graphics.getWidth()/3;
+		tradeButton.x = Gdx.graphics.getWidth()/2;
 		tradeButton.y = Gdx.graphics.getHeight()/2;
 	}
 	
@@ -247,6 +245,11 @@ public class TradeHandler{
 	{
 		Vector2 tempV = new Vector2(tradeButton.x, tradeButton.y);
 		return tempV;
+	}
+	
+	public Rectangle getTradeButton()
+	{
+		return tradeButton;
 	}
 	
 	public void setTrading(Boolean inputBoolean){trading = inputBoolean;}
