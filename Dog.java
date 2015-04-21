@@ -14,6 +14,15 @@ public class Dog extends Entity{
 		super(inputX, inputY, inputPlayer, "dog", inputMainState);
 		setCollision(img);
 		type = Type.Neutral;
+		
+		im = new InventoryManager(this);
+		im.addItem(new Item("Dagger", myName));
+		im.addItem(new Item("Dagger", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("Shield", myName));
+		im.addItem(new Item("DonkHammer", myName));
+
 	}
 	
 	public Texture Draw(){return img;}
@@ -48,13 +57,7 @@ public class Dog extends Entity{
 
 	public void setupTrade()
 	{
-		im = new InventoryManager(this);
-		im.addItem(new Item("Dagger", myName));
-		im.addItem(new Item("Dagger", myName));
-		im.addItem(new Item("Shield", myName));
-		im.addItem(new Item("Shield", myName));
-		im.addItem(new Item("Shield", myName));
-		im.addItem(new Item("DonkHammer", myName));
+
 	}
 
 	

@@ -134,7 +134,12 @@ public abstract class Entity {
 			im = new InventoryManager(this);
 		}
 		
-		public void setInventoryManager(InventoryManager inputIM){im = inputIM;}
+		public void setInventoryManager(InventoryManager inputIM)
+		{
+			System.out.println("Entity.setInventoryManager() current inventory manager is " + im);
+			im = inputIM;
+			System.out.println("Entity.setInventoryManager() current inventory manager is " + im);
+		}
 		
 		public void update()
 		{

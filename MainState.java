@@ -207,27 +207,29 @@ public class MainState extends GameState{
 			
 			player.getTradeHandler().draw();
 			//If the value of the goods in the trade window for the player exceeds the value of the good of the NPC
-			if(player.getTradeHandler().checkPrices())
+			sb.begin();
+			switch(player.getTradeHandler().checkValue())
 			{
-				//The player will be trading at a loss, therefore player will need to pay a cost
-				int cost = player.getTradeHandler().getEntityTotal() -  player.getTradeHandler().getPlayerTotal();
-				sb.begin();
-				chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
-				chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
-				chatFont.draw(sb, "Cost: " + cost, 250, 250);
-				sb.end();
+				case "PLAYER":
+					int cost = player.getTradeHandler().getEntityTotal() -  player.getTradeHandler().getPlayerTotal();
+					chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
+					chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
+					chatFont.draw(sb, "Cost: " + cost, 250, 250);
+					break;
+				case "ENTITY":
+					int profit =  player.getTradeHandler().getEntityTotal() - player.getTradeHandler().getPlayerTotal();
+					chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
+					chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
+					chatFont.draw(sb, "Profit: " + profit, 250, 250);
+					break;
+				default:
+					break;
 			}
-			else
-			{
-				//This shouldn't really happen, but for measurement purposes so the player can get a running total
-				//The player's profit will be the player's total less the entity's current total
-				int profit =  player.getTradeHandler().getEntityTotal() - player.getTradeHandler().getPlayerTotal();
-				sb.begin();
-				chatFont.draw(sb, "Player value: " + player.getTradeHandler().getPlayerTotal(), 250, 200);
-				chatFont.draw(sb, "Entity value: " + player.getTradeHandler().getEntityTotal(), 250, 150);
-				chatFont.draw(sb, "Profit: " + profit, 250, 250);
-				sb.end();
-			}
+			chatFont.draw(sb,  "Trade",  player.getTradeHandler().getTrade().x, player.getTradeHandler().getTrade().y);
+			chatFont.draw(sb, "Player coins: " + String.valueOf(player.getTradeHandler().getPlayerCoins()),  100,  100);
+			chatFont.draw(sb, "Entity coins: " + String.valueOf(player.getTradeHandler().getEntityCoins()),  Gdx.graphics.getWidth() - 100,  100);
+			chatFont.draw(sb, "Trade handler memory address: " + player.getTradeHandler().toString(),  100,  30);
+			sb.end();
 		}
 		
 		if(player.getState() == State.Inventory)

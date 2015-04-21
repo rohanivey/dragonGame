@@ -603,6 +603,7 @@ public class Player {
 	@SuppressWarnings("static-access")
 	public void setStateChatting() {
 		currentState = currentState.Chatting;
+		th = null;
 	}
 
 	@SuppressWarnings("static-access")

@@ -108,6 +108,7 @@ public class Cursor {
 		//Play with the copies		
 		tempIM.removeItem(tempSlot);
 		System.out.println("Slot.testSwap() has now removed the item in tempSlot");
+		//Is there room for the currently held item at the location of the item we just temporarily removed
 		if(tempIM.checkGridRoom(heldItem, tempSlot.getRow(), tempSlot.getCol()))
 		{
 			System.out.println("Cursor.testSwap() returned true");

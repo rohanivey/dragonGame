@@ -200,6 +200,8 @@ public class InventoryManager {
 		{
 			for(int col = 0; col < tempGrid[row].length; col++ )
 			{
+				//CHECK TO SEE IF THE SLOT IS SLAVE OR MASTER, not if there is an item there.
+				//TODO: CHECK THIS FOR VERIFICATION
 				if(inputGrid[row][col].getCurrentItem() != null)
 				{
 					System.out.println("InventoryManager.copyGrid() is trying to read the value at " + row + ", " + col);
@@ -332,7 +334,7 @@ public class InventoryManager {
 			{
 				slot = new Slot(this, row, col, startingX, startingY);
 				grid[row][col] = slot;
-				System.out.println("Slot's owner is " + getType().toString());
+				//System.out.println("Slot's owner is " + getType().toString());
 				//System.out.println("Adding new slot at location:[" + row + ", " + col + "]");
 			}
 		}
