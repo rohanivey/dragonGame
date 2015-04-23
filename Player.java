@@ -18,9 +18,11 @@ public class Player {
 	enum AnimationState {
 		Left, Right, Up, Down
 	}
+
 	enum State {
 		Chatting, Moving, Trading, Fishing, Inventory
 	}
+
 	private Vector2 location;
 	private Vector2 previousLocation;
 	private Vector2 tempLocation;
@@ -65,7 +67,7 @@ public class Player {
 	private InventoryManager im;
 
 	private int str, wis, intel;
-	
+
 	private int coins = 150;
 
 	public Player(int inputX, int inputY, MainState inputMainState) {
@@ -347,9 +349,8 @@ public class Player {
 	public int getChatSelection() {
 		return chatSelection;
 	}
-	
-	public int getCoins()
-	{
+
+	public int getCoins() {
 		return coins;
 	}
 
@@ -595,35 +596,39 @@ public class Player {
 	public void setActiveEntity(Entity inputActiveEntity) {
 		activeEntity = inputActiveEntity;
 	}
-	
-	public void setCoins(int inputCoins){coins = inputCoins;}
-	
-	public void setInventoryManager(InventoryManager inputIM){im = inputIM;}
+
+	public void setCoins(int inputCoins) {
+		coins = inputCoins;
+	}
+
+	public void setInventoryManager(InventoryManager inputIM) {
+		im = inputIM;
+	}
 
 	@SuppressWarnings("static-access")
 	public void setStateChatting() {
-		currentState = currentState.Chatting;
+		currentState = State.Chatting;
 		th = null;
 	}
 
 	@SuppressWarnings("static-access")
 	public void setStateFishing() {
-		currentState = currentState.Fishing;
+		currentState = State.Fishing;
 	}
 
 	@SuppressWarnings("static-access")
 	public void setStateInventory() {
-		currentState = currentState.Inventory;
+		currentState = State.Inventory;
 	}
 
 	@SuppressWarnings("static-access")
 	public void setStateMoving() {
-		currentState = currentState.Moving;
+		currentState = State.Moving;
 	}
 
 	@SuppressWarnings("static-access")
 	public void setStateTrading() {
-		currentState = currentState.Trading;
+		currentState = State.Trading;
 	}
 
 	public void setupTrading() {

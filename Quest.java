@@ -2,9 +2,8 @@ package com.rohan.dragonGame;
 
 public class Quest {
 
-	public Quest(int inputID)
-	{
-		
+	public Quest(int inputID) {
+
 	}
-	
+
 }
