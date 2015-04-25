@@ -70,11 +70,13 @@ public class Player {
 
 	private int coins = 150;
 
-	public Player(int inputX, int inputY, MainState inputMainState) {
+	private Level level;
+
+	public Player(int inputX, int inputY, Level inputLevel) {
 
 		location = new Vector2(inputX, inputY);
 		previousLocation = location;
-		ms = inputMainState;
+		level = inputLevel;
 		img = new Texture("animations/player.png");
 		TextureRegion[][] tempFrames = TextureRegion.split(img, img.getWidth()
 				/ FRAME_COLS, img.getHeight() / FRAME_ROWS);
@@ -207,7 +209,7 @@ public class Player {
 		if (Gdx.input.isKeyPressed(Keys.W)) {
 			animationState = AnimationState.Up;
 			handleAnimation();
-			for (Entity e : ms.getCritters()) {
+			for (Entity e : level.getCritters()) {
 				tempCollision = new Rectangle(this.getCollision().x,
 						this.getCollision().y + speed,
 						this.getCollision().width, this.getCollision().height);
@@ -216,7 +218,7 @@ public class Player {
 					e.handleCollision(this);
 				}
 			}
-			for (Rectangle r : ms.getColliders()) {
+			for (Rectangle r : level.getColliders()) {
 				tempCollision = new Rectangle(this.getCollision().x,
 						this.getCollision().y + speed,
 						this.getCollision().width, this.getCollision().height);
@@ -230,7 +232,7 @@ public class Player {
 		} else if (Gdx.input.isKeyPressed(Keys.S)) {
 			animationState = AnimationState.Down;
 			handleAnimation();
-			for (Entity e : ms.getCritters()) {
+			for (Entity e : level.getCritters()) {
 				tempCollision = new Rectangle(this.getCollision().x,
 						this.getCollision().y - speed,
 						this.getCollision().width, this.getCollision().height);
@@ -239,7 +241,7 @@ public class Player {
 					e.handleCollision(this);
 				}
 			}
-			for (Rectangle r : ms.getColliders()) {
+			for (Rectangle r : level.getColliders()) {
 				tempCollision = new Rectangle(this.getCollision().x,
 						this.getCollision().y - speed,
 						this.getCollision().width, this.getCollision().height);
@@ -253,7 +255,7 @@ public class Player {
 		} else if (Gdx.input.isKeyPressed(Keys.A)) {
 			animationState = AnimationState.Left;
 			handleAnimation();
-			for (Entity e : ms.getCritters()) {
+			for (Entity e : level.getCritters()) {
 				tempCollision = new Rectangle(this.getCollision().x - speed,
 						this.getCollision().y, this.getCollision().width,
 						this.getCollision().height);
@@ -262,7 +264,7 @@ public class Player {
 					e.handleCollision(this);
 				}
 			}
-			for (Rectangle r : ms.getColliders()) {
+			for (Rectangle r : level.getColliders()) {
 				tempCollision = new Rectangle(this.getCollision().x - speed,
 						this.getCollision().y, this.getCollision().width,
 						this.getCollision().height);
@@ -276,7 +278,7 @@ public class Player {
 		} else if (Gdx.input.isKeyPressed(Keys.D)) {
 			animationState = AnimationState.Right;
 			handleAnimation();
-			for (Entity e : ms.getCritters()) {
+			for (Entity e : level.getCritters()) {
 				tempCollision = new Rectangle(this.getCollision().x + speed,
 						this.getCollision().y, this.getCollision().width,
 						this.getCollision().height);
@@ -285,7 +287,7 @@ public class Player {
 					e.handleCollision(this);
 				}
 			}
-			for (Rectangle r : ms.getColliders()) {
+			for (Rectangle r : level.getColliders()) {
 				tempCollision = new Rectangle(this.getCollision().x + speed,
 						this.getCollision().y, this.getCollision().width,
 						this.getCollision().height);
@@ -495,7 +497,7 @@ public class Player {
 				interactTimer = 0.25f;
 				interactCircle.setPosition(interactCircleLocation);
 
-				for (Iterator<Item> iterator = ms.getItems().iterator(); iterator
+				for (Iterator<Item> iterator = level.getItems().iterator(); iterator
 						.hasNext();) {
 					Item i = iterator.next();
 					if (Intersector.overlaps(interactCircle,
@@ -516,7 +518,7 @@ public class Player {
 					// ms.getItems().size());
 				}
 
-				for (Entity e : ms.getCritters()) {
+				for (Entity e : level.getCritters()) {
 					if (Intersector.overlaps(interactCircle, e.getCollision())) {
 						for (int i = 0; i < characterKnowledge.length; i++) {
 							if (characterKnowledge[i][0] == e.getName()) {
@@ -568,7 +570,7 @@ public class Player {
 	}
 
 	public void loadMap() {
-		mapProperties = ms.getCurrentMapProperties();
+		mapProperties = level.getCurrentMapProperties();
 		int mapGridWidth = mapProperties.get("width", Integer.class);
 		int mapGridHeight = mapProperties.get("height", Integer.class);
 		int tilePixelWidth = mapProperties.get("tilewidth", Integer.class);
@@ -647,9 +649,7 @@ public class Player {
 
 		handleInput();
 		handleCollision();
-
 		screenEdging();
-
 	}
 
 }

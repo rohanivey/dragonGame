@@ -5,7 +5,13 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
@@ -28,19 +34,64 @@ public class DialogueHandler {
 	private String currentResponse;
 
 	private Boolean trading = false;
+	private ShapeRenderer sr;
+	private Rectangle chatBox;
+	private Vector2 chatLoc;
+	private BitmapFont chatFont;
 
-	DialogueHandler(String inputNPC) {
+	private SpriteBatch sb;
+	private Level level;
+
+	DialogueHandler(String inputNPC, Level inputLevel) {
 		talkingPoints = new ArrayList<String>();
 		img = new Texture(Gdx.files.internal("pointer.png"));
 		sprite = new Sprite(img);
 		NPCName = inputNPC;
 		reader = new XmlReader();
+		sb = new SpriteBatch();
+		level = inputLevel;
+
+		chatBox = new Rectangle(0, 0, Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight() / 4);
+		chatFont = new BitmapFont();
+		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height
+				- chatFont.getLineHeight());
+
+		// Debug things
+		sr = new ShapeRenderer();
 
 		// May need to set to 1,1
 		playerKnowledgeCopy = new String[0][0];
 
 		// createDialogue();
 
+	}
+
+	DialogueHandler() {
+	}
+
+	public Vector2 getChatLoc() {
+		return chatLoc;
+	}
+
+	public float getChatLocY(int inputInt) {
+		float y = chatBox.height - chatFont.getLineHeight()
+				- chatFont.getLineHeight() * inputInt;
+		return y;
+	}
+
+	public void setChatLocY(int inputY) {
+		chatLoc.y = chatBox.height - chatFont.getLineHeight()
+				- chatFont.getLineHeight() * inputY;
+	}
+
+	public void renderChatBox() {
+		sr.setColor(0, 0, 1, 0.1f);
+		sr.setProjectionMatrix(level.getCamera().combined);
+
+		sr.begin(ShapeType.Filled);
+		sr.rect(chatBox.x, chatBox.y, chatBox.width, chatBox.height);
+		sr.end();
 	}
 
 	public String selectDialogue(int inputInt) {
@@ -224,6 +275,27 @@ public class DialogueHandler {
 			}
 		}
 		return false;
+	}
+
+	public void Draw() {
+		sb.begin();
+		if (getResponding()) {
+			setChatLocY(0);
+			chatFont.draw(sb, level.getPlayer().getActiveEntity()
+					.getDialogueHandler().getResponse(), chatLoc.x, chatLoc.y);
+		} else {
+			for (int i = 0; i < level.getPlayer().getActiveEntity()
+					.getDialogueHandler().getTalkingPoints().size(); i++) {
+				setChatLocY(i);
+				chatFont.draw(sb, level.getPlayer().getActiveEntity()
+						.getDialogueHandler().produceDialogue(i), chatLoc.x,
+						chatLoc.y);
+			}
+			sb.draw(level.getPlayer().getActiveEntity().getDialogueHandler()
+					.getTexture(), chatLoc.x - 12, getChatLocY(level
+					.getPlayer().getChatSelection()) - 8, 12, 8);
+		}
+		sb.end();
 	}
 
 }

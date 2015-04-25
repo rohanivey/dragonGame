@@ -1,5 +1,6 @@
 package com.rohan.dragonGame;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -30,18 +31,19 @@ public abstract class Entity {
 	String[][] pKnowCopy;
 	String myName;
 	int coins;
+	Level level;
 
 	InventoryManager im;
 
 	Entity(int inputX, int inputY, Player inputPlayer, String inputName,
-			MainState inputMainState) {
-		ms = inputMainState;
+			Level inputLevel) {
 		location = new Vector2(inputX, inputY);
 		p = inputPlayer;
-		dh = new DialogueHandler(inputName);
-		sb = ms.getSpriteBatch();
-		chatBox = new Rectangle(0, 0, ms.getHUDCamera().viewportWidth,
-				ms.getHUDCamera().viewportHeight / 4);
+		level = inputLevel;
+		dh = new DialogueHandler(inputName, inputLevel);
+		sb = new SpriteBatch();
+		chatBox = new Rectangle(0, 0, Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight() / 4);
 		chatFont = new BitmapFont();
 		chatLoc = new Vector2(chatBox.x + 16, chatBox.y + chatBox.height
 				- chatFont.getLineHeight());

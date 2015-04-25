@@ -7,8 +7,8 @@ public class Dog extends Entity {
 
 	Texture img = new Texture("dog.png");
 
-	Dog(int inputX, int inputY, Player inputPlayer, MainState inputMainState) {
-		super(inputX, inputY, inputPlayer, "dog", inputMainState);
+	Dog(int inputX, int inputY, Player inputPlayer, Level inputLevel) {
+		super(inputX, inputY, inputPlayer, "dog", inputLevel);
 		setCollision(img);
 		type = Type.Neutral;
 
