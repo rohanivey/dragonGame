@@ -85,12 +85,12 @@ public class MenuState extends GameState {
 		// New Game
 		case 0:
 			// Swap state to MainState
-			newState = newState.Play;
+			newState = State.Play;
 			break;
 		// Options
 		case 1:
 			// Swap state to Options
-			newState = newState.Options;
+			newState = State.Options;
 			break;
 		// Exit game
 		case 2:

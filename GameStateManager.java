@@ -48,9 +48,9 @@ public class GameStateManager {
 					menu.update();
 				}
 				break;
-			// case OptionsMenu:
-			// menu.update();
-			// break;
+			case OptionsMenu:
+				options.update();
+				break;
 			case Play:
 				if (mainGame.stateChange()) {
 					String tempString = menu.getState();
@@ -93,13 +93,13 @@ public class GameStateManager {
 	public void changeState(String inputString) {
 		switch (inputString) {
 		case "Main":
-			currentState = currentState.MainMenu;
+			currentState = State.MainMenu;
 			break;
 		case "Play":
-			currentState = currentState.Play;
+			currentState = State.Play;
 			break;
 		case "Options":
-			currentState = currentState.OptionsMenu;
+			currentState = State.OptionsMenu;
 			break;
 		}
 	}

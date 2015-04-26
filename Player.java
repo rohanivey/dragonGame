@@ -27,7 +27,6 @@ public class Player {
 	private Vector2 previousLocation;
 	private Vector2 tempLocation;
 	private Texture img;
-	private MainState ms;
 	private MapProperties mapProperties;
 
 	private int mapWidth;
@@ -305,6 +304,7 @@ public class Player {
 			// ms.getCamera().setToOrtho(true);
 			System.out.println("true ortho");
 		}
+
 	}
 
 	public int checkNPCID() {
@@ -315,6 +315,35 @@ public class Player {
 		}
 		System.out.println("No npc yo");
 		return 99999999;
+	}
+
+	public void checkLevelChange() {
+		Rectangle tempCollision;
+		for (Zone z : level.getTeleporters()) {
+			tempCollision = new Rectangle(this.getCollision().x,
+					this.getCollision().y, this.getCollision().width,
+					this.getCollision().height);
+			if (Intersector.overlaps(tempCollision, z.getRectangle())) {
+				System.out
+						.println("Player.checkLevelChange is getting a zone change of the type "
+								+ z.getType());
+				switch (z.getType()) {
+				case "ORTHOGRAPHIC":
+					System.out
+							.println("Player.checkLevel change is setting level to a new orthographic level");
+					level.ms.changeLevel(new OrthoLevel(level.ms, z
+							.getDestination()));
+					break;
+				case "PLATFORM":
+					System.out
+							.println("Player.checkLevel change is setting level to a new platform level");
+					level.ms.changeLevel(new PlatformLevel(level.ms, z
+							.getDestination()));
+					break;
+				}
+
+			}
+		}
 	}
 
 	public void checkTrading() {
@@ -607,28 +636,23 @@ public class Player {
 		im = inputIM;
 	}
 
-	@SuppressWarnings("static-access")
 	public void setStateChatting() {
 		currentState = State.Chatting;
 		th = null;
 	}
 
-	@SuppressWarnings("static-access")
 	public void setStateFishing() {
 		currentState = State.Fishing;
 	}
 
-	@SuppressWarnings("static-access")
 	public void setStateInventory() {
 		currentState = State.Inventory;
 	}
 
-	@SuppressWarnings("static-access")
 	public void setStateMoving() {
 		currentState = State.Moving;
 	}
 
-	@SuppressWarnings("static-access")
 	public void setStateTrading() {
 		currentState = State.Trading;
 	}
@@ -650,6 +674,7 @@ public class Player {
 		handleInput();
 		handleCollision();
 		screenEdging();
+		checkLevelChange();
 	}
 
 }

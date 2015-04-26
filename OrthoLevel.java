@@ -1,5 +1,8 @@
 package com.rohan.dragonGame;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
 import com.rohan.dragonGame.Player.State;
 
 public class OrthoLevel extends Level {
@@ -72,7 +75,6 @@ public class OrthoLevel extends Level {
 			// states, so you must end one before beginning the next
 			// TODO: Replace render chat box with real image, so alpha blending
 			// can occur
-			// dh.renderChatBox();
 			player.getActiveEntity().getDialogueHandler().renderChatBox();
 			player.getActiveEntity().getDialogueHandler().Draw();
 
@@ -145,6 +147,15 @@ public class OrthoLevel extends Level {
 		if (player.getState() == State.Inventory) {
 			player.getInventoryManager().draw();
 		}
+
+		sr.setProjectionMatrix(cam.combined);
+		sr.setAutoShapeType(true);
+		sr.setColor(Color.BLACK);
+		sr.begin();
+		sr.set(ShapeType.Filled);
+		Rectangle r = teleporters.get(0).getRectangle();
+		sr.rect(r.x, r.y, r.width, r.height);
+		sr.end();
 	}
 
 }

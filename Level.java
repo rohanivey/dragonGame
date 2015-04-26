@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -23,50 +24,31 @@ public class Level {
 	protected TiledMapTileLayer fg;
 	protected TiledMapTileLayer oj;
 	protected TiledMapTileLayer oh;
+	protected TiledMapTileLayer tele;
 	protected OrthogonalTiledMapRenderer mapRenderer;
 	protected ArrayList<Rectangle> colliders;
 	protected ArrayList<Item> itemsOnScreen;
 	protected ArrayList<Entity> critters;
+	protected ArrayList<Zone> teleporters;
+	protected ShapeRenderer sr;
+
 	protected OrthographicCamera cam;
+
 	protected Player player;
+
 	protected BitmapFont chatFont;
-
-	public Player getPlayer() {
-		return player;
-	}
-
 	protected MainState ms;
 	protected Music levelMusic;
+
 	protected ArrayList<TiledMap> level;
 
 	protected DialogueHandler dh;
-
-	public Level(MainState inputMS, String inputLevel) {
-		level = new ArrayList<TiledMap>();
-		critters = new ArrayList<Entity>();
-		itemsOnScreen = new ArrayList<Item>();
-		ms = inputMS;
-		dh = new DialogueHandler();
-		cam = new OrthographicCamera(Gdx.graphics.getWidth(),
-				Gdx.graphics.getHeight());
-
-		chatFont = new BitmapFont();
-		sb = new SpriteBatch();
-
-		areaLoad(inputLevel);
-
-		// //////////
-		/*
-		 * 
-		 * ADD LEVEL LOADER HERE FOR PARSING THE LEVEL carnivalMusic =
-		 * Gdx.audio.newMusic(Gdx.files .internal("Music/carnivalrides.ogg"));
-		 */
-	}
 
 	public Level(MainState inputMS) {
 		level = new ArrayList<TiledMap>();
 		critters = new ArrayList<Entity>();
 		itemsOnScreen = new ArrayList<Item>();
+		teleporters = new ArrayList<Zone>();
 		ms = inputMS;
 		cam = new OrthographicCamera(Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
@@ -74,8 +56,11 @@ public class Level {
 		chatFont = new BitmapFont();
 		dh = new DialogueHandler();
 		sb = new SpriteBatch();
+		sr = new ShapeRenderer();
 
 		areaLoad("firstMap.tmx");
+
+		ms.pauseUpdate(false);
 		// //////////
 		/*
 		 * 
@@ -84,10 +69,34 @@ public class Level {
 		 */
 	}
 
-	public void update() {
-		player.update();
-		entityUpdate();
-		cameraHandler();
+	public Level(MainState inputMS, String inputLevel) {
+		level = new ArrayList<TiledMap>();
+		critters = new ArrayList<Entity>();
+		itemsOnScreen = new ArrayList<Item>();
+		teleporters = new ArrayList<Zone>();
+		ms = inputMS;
+		dh = new DialogueHandler();
+		cam = new OrthographicCamera(Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight());
+
+		chatFont = new BitmapFont();
+		sb = new SpriteBatch();
+		sr = new ShapeRenderer();
+
+		areaLoad(inputLevel);
+
+		ms.pauseUpdate(false);
+
+		// //////////
+		/*
+		 * 
+		 * ADD LEVEL LOADER HERE FOR PARSING THE LEVEL carnivalMusic =
+		 * Gdx.audio.newMusic(Gdx.files .internal("Music/carnivalrides.ogg"));
+		 */
+	}
+
+	public void addEntity(Entity e) {
+		critters.add(e);
 	}
 
 	public void areaLoad(String inputString) {
@@ -97,23 +106,6 @@ public class Level {
 
 		// mapRenderer.setView(cam);
 
-	}
-
-	public void entityUpdate() {
-		for (Entity e : critters) {
-			e.update();
-		}
-	}
-
-	public OrthographicCamera getCamera() {
-		return cam;
-	}
-
-	public SpriteBatch getSB() {
-		return sb;
-	}
-
-	public void draw() {
 	}
 
 	public void cameraHandler() {
@@ -144,20 +136,21 @@ public class Level {
 		cam.update();
 	}
 
+	public void draw() {
+	}
+
+	public void entityUpdate() {
+		for (Entity e : critters) {
+			e.update();
+		}
+	}
+
+	public OrthographicCamera getCamera() {
+		return cam;
+	}
+
 	public ArrayList<Rectangle> getColliders() {
 		return colliders;
-	}
-
-	public void stopMusic() {
-		levelMusic.stop();
-	}
-
-	public void stopPlayer() {
-		player.fullStop();
-	}
-
-	public void startMusic() {
-		levelMusic.play();
 	}
 
 	public ArrayList<Entity> getCritters() {
@@ -172,8 +165,20 @@ public class Level {
 		return itemsOnScreen;
 	}
 
+	public Player getPlayer() {
+		return player;
+	}
+
+	public SpriteBatch getSB() {
+		return sb;
+	}
+
 	public SpriteBatch getSpriteBatch() {
 		return sb;
+	}
+
+	public ArrayList<Zone> getTeleporters() {
+		return teleporters;
 	}
 
 	public void itemUpdate() {
@@ -189,6 +194,7 @@ public class Level {
 		fg = (TiledMapTileLayer) tileMap.getLayers().get("Foreground");
 		oj = (TiledMapTileLayer) tileMap.getLayers().get("Objects");
 		oh = (TiledMapTileLayer) tileMap.getLayers().get("Overhead");
+		tele = (TiledMapTileLayer) tileMap.getLayers().get("Teleporter");
 
 		for (int row = 0; row < oj.getHeight(); row++) {
 			for (int col = 0; col < oj.getWidth(); col++) {
@@ -205,6 +211,31 @@ public class Level {
 			}
 		}
 
+		for (int row = 0; row < tele.getHeight(); row++) {
+			for (int col = 0; col < tele.getWidth(); col++) {
+				Cell cell = tele.getCell(col, row);
+				if (cell == null)
+					continue;
+				if (cell.getTile() == null)
+					continue;
+				Rectangle r = new Rectangle(col * tele.getTileWidth(), row
+						* tele.getTileHeight(), tele.getTileWidth(),
+						tele.getTileHeight());
+				System.out
+						.println("The destination for the cell on this map is : ");
+				System.out.println(cell.getTile().getProperties()
+						.get("Destination"));
+				System.out.println("The type is : ");
+				System.out.println(cell.getTile().getProperties()
+						.get("MapType"));
+				Zone z = new Zone(r, (String) cell.getTile().getProperties()
+						.get("Destination"), (String) cell.getTile()
+						.getProperties().get("mapType"));
+				teleporters.add(z);
+
+			}
+		}
+
 		return tileMap;
 	}
 
@@ -212,8 +243,26 @@ public class Level {
 		player = inputPlayer;
 	}
 
-	public void addEntity(Entity e) {
-		critters.add(e);
+	public void setTeleporters(ArrayList<Zone> teleporters) {
+		this.teleporters = teleporters;
+	}
+
+	public void startMusic() {
+		levelMusic.play();
+	}
+
+	public void stopMusic() {
+		levelMusic.stop();
+	}
+
+	public void stopPlayer() {
+		player.fullStop();
+	}
+
+	public void update() {
+		player.update();
+		entityUpdate();
+		cameraHandler();
 	}
 
 }

@@ -35,9 +35,24 @@ public class MainState extends GameState {
 
 	@Override
 	public void draw() {
-
 		currentLevel.draw();
+	}
 
+	public Boolean setLevel(Level inputLevel) {
+		System.out.println("MainState.setLevel() is beginning");
+		currentLevel = inputLevel;
+		System.out.println("MainState.setLevel() is ending");
+		return true;
+	}
+
+	public Boolean changeLevel(Level inputLevel) {
+		paused = true;
+		System.out.println("MainState.changeLevel() has begun");
+		while (!setLevel(inputLevel)) {
+		}
+		paused = false;
+		System.out.println("MainState.changeLevel() is ending");
+		return true;
 	}
 
 	public void pauseUpdate(Boolean inputBoolean) {
