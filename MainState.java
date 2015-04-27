@@ -10,6 +10,8 @@ public class MainState extends GameState {
 	private String currentMap;
 	private Level currentLevel;
 
+	private Boolean debug;
+
 	public MainState(String inputMap) {
 		ms = this;
 		paused = false;
@@ -26,11 +28,20 @@ public class MainState extends GameState {
 		OrthoLevel ol = new OrthoLevel(ms);
 		currentLevel = ol;
 		System.out.println("MainState initialized");
+		debug = true;
 	}
 
 	@Override
 	public void dispose() {
 
+	}
+
+	public Boolean getDebug() {
+		return debug;
+	}
+
+	public void setDebug() {
+		debug = !debug;
 	}
 
 	@Override

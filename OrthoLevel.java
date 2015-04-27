@@ -53,6 +53,7 @@ public class OrthoLevel extends Level {
 			mapRenderer.renderTileLayer(bg);
 			mapRenderer.renderTileLayer(fg);
 			mapRenderer.renderTileLayer(oj);
+			mapRenderer.renderTileLayer(zones);
 
 			// Draw every item on screen
 			for (Item i : itemsOnScreen) {

@@ -403,7 +403,7 @@ public class Player {
 		else if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
 			currentState = State.Inventory;
 			// ms.getCamera().setToOrtho(true);
-			System.out.println("true ortho");
+
 		}
 
 	}
@@ -587,34 +587,33 @@ public class Player {
 
 	public void handleInput() {
 
-		// If the player is currently in the moving state then check for
-		// movement input
-		if (currentState == State.Moving) {
+		switch (getState()) {
+		case Chatting:
+			checkChatting();
+			break;
+		case Fishing:
+			break;
+		case Inventory:
+			checkInventory();
+			break;
+		case Moving:
 			checkMovement();
 			interact();
-		}
-
-		// Else, check if player is chatting
-		else if (currentState == State.Chatting) {
-			checkChatting();
-		}
-
-		// Else check if fishing
-		else if (currentState == State.Fishing) {
-		}
-
-		// Else check if trading
-		else if (currentState == State.Trading) {
+			break;
+		case Trading:
 			checkTrading();
-		}
-
-		else if (currentState == State.Inventory) {
-			checkInventory();
+			break;
+		default:
+			break;
 		}
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			writeData();
 			System.exit(0);
+		}
+
+		if (Gdx.input.isKeyJustPressed(Keys.F9)) {
+			level.ms.setDebug();
 		}
 
 	}
