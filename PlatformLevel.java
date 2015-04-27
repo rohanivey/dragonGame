@@ -1,11 +1,15 @@
 package com.rohan.dragonGame;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+
 public class PlatformLevel extends Level {
 
 	public PlatformLevel(MainState inputMS, String inputLevel) {
 		super(inputMS, inputLevel);
 
-		player = new Player(30, 30, this);
+		player = new PlatformPlayer(30, 90, this);
 
 	}
 
@@ -34,6 +38,21 @@ public class PlatformLevel extends Level {
 
 		mapRenderer.renderTileLayer(oh);
 		sb.end();
+
+		sr.setProjectionMatrix(cam.combined);
+		sr.setAutoShapeType(true);
+		sr.setColor(Color.BLACK);
+		sr.begin();
+		sr.set(ShapeType.Filled);
+		for (Zone z : zoneArray) {
+			Rectangle r = z.getRectangle();
+			if (z instanceof TeleZone)
+				sr.setColor(Color.BLACK);
+			if (z instanceof LadderZone)
+				sr.setColor(Color.BLUE);
+			sr.rect(r.x, r.y, r.width, r.height);
+		}
+		sr.end();
 
 	}
 

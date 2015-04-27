@@ -24,12 +24,12 @@ public class Level {
 	protected TiledMapTileLayer fg;
 	protected TiledMapTileLayer oj;
 	protected TiledMapTileLayer oh;
-	protected TiledMapTileLayer tele;
+	protected TiledMapTileLayer zones;
 	protected OrthogonalTiledMapRenderer mapRenderer;
 	protected ArrayList<Rectangle> colliders;
 	protected ArrayList<Item> itemsOnScreen;
 	protected ArrayList<Entity> critters;
-	protected ArrayList<Zone> teleporters;
+	protected ArrayList<Zone> zoneArray;
 	protected ShapeRenderer sr;
 
 	protected OrthographicCamera cam;
@@ -48,7 +48,7 @@ public class Level {
 		level = new ArrayList<TiledMap>();
 		critters = new ArrayList<Entity>();
 		itemsOnScreen = new ArrayList<Item>();
-		teleporters = new ArrayList<Zone>();
+		zoneArray = new ArrayList<Zone>();
 		ms = inputMS;
 		cam = new OrthographicCamera(Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
@@ -73,7 +73,7 @@ public class Level {
 		level = new ArrayList<TiledMap>();
 		critters = new ArrayList<Entity>();
 		itemsOnScreen = new ArrayList<Item>();
-		teleporters = new ArrayList<Zone>();
+		zoneArray = new ArrayList<Zone>();
 		ms = inputMS;
 		dh = new DialogueHandler();
 		cam = new OrthographicCamera(Gdx.graphics.getWidth(),
@@ -177,8 +177,8 @@ public class Level {
 		return sb;
 	}
 
-	public ArrayList<Zone> getTeleporters() {
-		return teleporters;
+	public ArrayList<Zone> getZones() {
+		return zoneArray;
 	}
 
 	public void itemUpdate() {
@@ -194,7 +194,7 @@ public class Level {
 		fg = (TiledMapTileLayer) tileMap.getLayers().get("Foreground");
 		oj = (TiledMapTileLayer) tileMap.getLayers().get("Objects");
 		oh = (TiledMapTileLayer) tileMap.getLayers().get("Overhead");
-		tele = (TiledMapTileLayer) tileMap.getLayers().get("Teleporter");
+		zones = (TiledMapTileLayer) tileMap.getLayers().get("Zones");
 
 		for (int row = 0; row < oj.getHeight(); row++) {
 			for (int col = 0; col < oj.getWidth(); col++) {
@@ -211,28 +211,45 @@ public class Level {
 			}
 		}
 
-		for (int row = 0; row < tele.getHeight(); row++) {
-			for (int col = 0; col < tele.getWidth(); col++) {
-				Cell cell = tele.getCell(col, row);
+		for (int row = 0; row < zones.getHeight(); row++) {
+			for (int col = 0; col < zones.getWidth(); col++) {
+				Cell cell = zones.getCell(col, row);
 				if (cell == null)
 					continue;
 				if (cell.getTile() == null)
 					continue;
-				Rectangle r = new Rectangle(col * tele.getTileWidth(), row
-						* tele.getTileHeight(), tele.getTileWidth(),
-						tele.getTileHeight());
-				System.out
-						.println("The destination for the cell on this map is : ");
-				System.out.println(cell.getTile().getProperties()
-						.get("Destination"));
-				System.out.println("The type is : ");
-				System.out.println(cell.getTile().getProperties()
-						.get("MapType"));
-				Zone z = new Zone(r, (String) cell.getTile().getProperties()
-						.get("Destination"), (String) cell.getTile()
-						.getProperties().get("mapType"));
-				teleporters.add(z);
+				Rectangle r = new Rectangle(col * zones.getTileWidth(), row
+						* zones.getTileHeight(), zones.getTileWidth(),
+						zones.getTileHeight());
 
+				String cellType = (String) cell.getTile().getProperties()
+						.get("Type");
+				if (cellType != null) {
+					System.out.println("Found cell Type: " + cellType);
+					switch (cellType) {
+					case "Teleporter":
+						System.out
+								.println("The destination for the cell on this map is : ");
+						System.out.println(cell.getTile().getProperties()
+								.get("Destination"));
+						System.out.println("The type is : ");
+						System.out.println(cell.getTile().getProperties()
+								.get("MapType"));
+						TeleZone t = new TeleZone(r, (String) cell.getTile()
+								.getProperties().get("Destination"),
+								(String) cell.getTile().getProperties()
+										.get("mapType"));
+						zoneArray.add(t);
+						break;
+					case "Ladder":
+						System.out.println("Adding a ladder zone");
+						LadderZone l = new LadderZone(r);
+						zoneArray.add(l);
+						break;
+					default:
+						continue;
+					}
+				}
 			}
 		}
 
@@ -243,8 +260,8 @@ public class Level {
 		player = inputPlayer;
 	}
 
-	public void setTeleporters(ArrayList<Zone> teleporters) {
-		this.teleporters = teleporters;
+	public void setZoneArray(ArrayList<Zone> inputZones) {
+		this.zoneArray = inputZones;
 	}
 
 	public void startMusic() {

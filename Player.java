@@ -23,38 +23,38 @@ public class Player {
 		Chatting, Moving, Trading, Fishing, Inventory
 	}
 
-	private Vector2 location;
-	private Vector2 previousLocation;
-	private Vector2 tempLocation;
-	private Texture img;
-	private MapProperties mapProperties;
+	protected Vector2 location;
+	protected Vector2 previousLocation;
+	protected Vector2 tempLocation;
+	protected Texture img;
+	protected MapProperties mapProperties;
 
-	private int mapWidth;
-	private int mapHeight;
-	private Animation walkLeft;
-	private Animation walkRight;
-	private Animation walkUp;
-	private Animation walkDown;
-	AnimationState animationState = AnimationState.Down;
+	protected int mapWidth;
+	protected int mapHeight;
+	protected Animation walkLeft;
+	protected Animation walkRight;
+	protected Animation walkUp;
+	protected Animation walkDown;
+	protected AnimationState animationState = AnimationState.Down;
 	State currentState = State.Moving;
-	float stateTime;
+	protected float stateTime;
 	TextureRegion[] animationFrames;
 	TextureRegion currentFrame;
 
 	// Horizontal
-	private static final int FRAME_COLS = 9;
+	protected static final int FRAME_COLS = 9;
 	// Vertical
-	private static final int FRAME_ROWS = 4;
-	private Rectangle boundingRectangle;
-	private Circle interactCircle;
+	protected static final int FRAME_ROWS = 4;
+	protected Rectangle boundingRectangle;
+	protected Circle interactCircle;
 
-	private Vector2 interactCircleLocation;
+	protected Vector2 interactCircleLocation;
 
-	private float interactTimer;
+	protected float interactTimer;
 
-	private int speed;
+	protected int speed;
 
-	private Entity activeEntity;
+	protected Entity activeEntity;
 	private int chatSelection;
 
 	private String[][] characterKnowledge;
@@ -63,13 +63,13 @@ public class Player {
 	private TradeHandler th;
 	private Boolean tradeSetup = false;
 
-	private InventoryManager im;
+	protected InventoryManager im;
 
-	private int str, wis, intel;
+	protected int str, wis, intel, agility;
 
-	private int coins = 150;
+	protected int coins = 150;
 
-	private Level level;
+	protected Level level;
 
 	public Player(int inputX, int inputY, Level inputLevel) {
 
@@ -127,6 +127,7 @@ public class Player {
 		str = 5;
 		wis = 3;
 		intel = 0;
+		agility = 8;
 		im = new InventoryManager(this);
 
 	}
@@ -319,26 +320,27 @@ public class Player {
 
 	public void checkLevelChange() {
 		Rectangle tempCollision;
-		for (Zone z : level.getTeleporters()) {
+		for (Zone z : level.getZones()) {
 			tempCollision = new Rectangle(this.getCollision().x,
 					this.getCollision().y, this.getCollision().width,
 					this.getCollision().height);
-			if (Intersector.overlaps(tempCollision, z.getRectangle())) {
+			if (Intersector.overlaps(tempCollision, z.getRectangle())
+					&& z instanceof TeleZone) {
 				System.out
 						.println("Player.checkLevelChange is getting a zone change of the type "
-								+ z.getType());
-				switch (z.getType()) {
+								+ ((TeleZone) z).getType());
+				switch (((TeleZone) z).getType()) {
 				case "ORTHOGRAPHIC":
 					System.out
 							.println("Player.checkLevel change is setting level to a new orthographic level");
-					level.ms.changeLevel(new OrthoLevel(level.ms, z
-							.getDestination()));
+					level.ms.changeLevel(new OrthoLevel(level.ms,
+							((TeleZone) z).getDestination()));
 					break;
 				case "PLATFORM":
 					System.out
 							.println("Player.checkLevel change is setting level to a new platform level");
-					level.ms.changeLevel(new PlatformLevel(level.ms, z
-							.getDestination()));
+					level.ms.changeLevel(new PlatformLevel(level.ms,
+							((TeleZone) z).getDestination()));
 					break;
 				}
 
