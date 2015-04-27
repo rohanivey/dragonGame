@@ -118,19 +118,19 @@ public abstract class Entity {
 
 	public void handleCollision(Player player) {
 		if (Intersector.overlaps(player.getCollision(), collisionShape)) {
-			p.fullStop();
+			// p.fullStop();
 			switch (type) {
 			case Friendly:
 				System.out.println("Friendly collision detected with "
-						+ this.toString());
+						+ this.myName);
 				break;
 			case Hostile:
 				System.out.println("Hostile collision detected with "
-						+ this.toString());
+						+ this.myName);
 				break;
 			default:
 				System.out.println("Neutral collision detected with "
-						+ this.toString());
+						+ this.myName);
 				break;
 
 			}

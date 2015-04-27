@@ -1,9 +1,12 @@
 package com.rohan.dragonGame;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,6 +15,10 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlReader.Element;
+import com.badlogic.gdx.utils.XmlWriter;
 
 public class Player {
 
@@ -70,6 +77,10 @@ public class Player {
 	protected int coins = 150;
 
 	protected Level level;
+	protected XmlReader reader;
+	protected StringWriter sw;
+	protected XmlWriter writer;
+	protected FileHandle file;
 
 	public Player(int inputX, int inputY, Level inputLevel) {
 
@@ -118,17 +129,13 @@ public class Player {
 		interactCircle = new Circle(interactCircleLocation.x,
 				interactCircleLocation.y, 4);
 		interactTimer = 0f;
+		reader = new XmlReader();
+		readData();
 
-		speed = 4;
+		speed = agility;
 
 		characterKnowledge = new String[1000][100];
 		characterKnowledge[0][0] = "thyself";
-
-		str = 5;
-		wis = 3;
-		intel = 0;
-		agility = 8;
-		im = new InventoryManager(this);
 
 	}
 
@@ -193,6 +200,97 @@ public class Player {
 
 	}
 
+	public void readData() {
+		readStats();
+		im = new InventoryManager(this);
+		readItems();
+	}
+
+	public void readStats() {
+
+		Element root;
+		try {
+			root = reader.parse(Gdx.files.local("player.xml"));
+			// Build player stats
+			Element stats = root.getChildByName("Stats");
+
+			str = stats.getInt("Strength");
+			System.out.println("Str is : " + str);
+			wis = stats.getInt("Wisdom");
+			intel = stats.getInt("Intelligence");
+			agility = stats.getInt("Agility");
+		} catch (IOException e) {
+			System.out.println("Player.readStats() could find no file");
+			e.printStackTrace();
+		}
+
+	}
+
+	public void readItems() {
+		Element root;
+		try {
+			root = reader.parse(Gdx.files.internal("player.xml"));
+			Element inventory = root.getChildByName("Inventory");
+			coins = inventory.getInt("Coins");
+			Element items = inventory.getChildByName("Items");
+			Array<Element> inventoryList = items.getChildrenByName("Item");
+			for (Element e : inventoryList) {
+				System.out.println("Name : " + e.getName());
+				System.out.println("Text: " + e.getText());
+			}
+			for (Element e : inventoryList) {
+				Item i = new Item(e.getText(), "PLAYER");
+				im.addItem(i);
+			}
+		} catch (IOException e1) {
+			System.out.println("Player.readItems() could find no file");
+			e1.printStackTrace();
+		}
+	}
+
+	public void writeData() {
+		sw = new StringWriter();
+		writer = new XmlWriter(sw);
+		System.out.println("Player.writeData() is beginning");
+		try {
+			file = Gdx.files.local("player.xml");
+			writeStats();
+			writeItems();
+			file.writeString(sw.toString(), false);
+		} catch (IOException e) {
+			System.out.println("Player.writeData() dun goofed");
+			e.printStackTrace();
+		}
+
+		finally {
+			try {
+				writer.close();
+			} catch (Exception ignore) {
+				// IGNORED
+			}
+		}
+		System.out.println("Player.writeData() is ending");
+	}
+
+	public void writeStats() throws IOException {
+		writer.element("Player").element("Stats").element("Strength").text(str)
+				.pop().element("Intelligence").text(intel).pop()
+				.element("Wisdom").text(wis).pop().element("Agility")
+				.text(agility).pop().pop();
+		System.out.println(sw);
+	}
+
+	public void writeItems() throws IOException {
+		writer.element("Inventory").element("Coins").text(coins).pop()
+				.element("Items");
+		for (Item i : im.getListOfItems()) {
+			writer.element("Item").text(i.getInputString()).pop();
+		}
+		writer.pop().pop().pop();
+		System.out.println(sw);
+		// file.writeString(sw.toString(), true);
+	}
+
 	public void checkInventory() {
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
 			// ms.getCamera().setToOrtho(false);
@@ -212,7 +310,8 @@ public class Player {
 			for (Entity e : level.getCritters()) {
 				tempCollision = new Rectangle(this.getCollision().x,
 						this.getCollision().y + speed,
-						this.getCollision().width, this.getCollision().height);
+						this.getCollision().width,
+						this.getCollision().height / 2);
 				if (Intersector.overlaps(tempCollision, e.getCollision())) {
 					canMove = false;
 					e.handleCollision(this);
@@ -221,7 +320,8 @@ public class Player {
 			for (Rectangle r : level.getColliders()) {
 				tempCollision = new Rectangle(this.getCollision().x,
 						this.getCollision().y + speed,
-						this.getCollision().width, this.getCollision().height);
+						this.getCollision().width,
+						this.getCollision().height / 2);
 				if (Intersector.overlaps(tempCollision, r)) {
 					canMove = false;
 				}
@@ -513,6 +613,7 @@ public class Player {
 		}
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+			writeData();
 			System.exit(0);
 		}
 
@@ -596,7 +697,7 @@ public class Player {
 		if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
 			speed = 40;
 		} else {
-			speed = 4;
+			speed = agility;
 		}
 	}
 

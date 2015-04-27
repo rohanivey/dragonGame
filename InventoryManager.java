@@ -1,5 +1,7 @@
 package com.rohan.dragonGame;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -254,6 +256,19 @@ public class InventoryManager {
 				+ " has called for InventoryManager.CopyMe()");
 		return new InventoryManager(gridHeight, gridWidth, startingX,
 				startingY, grid, type, cursor);
+	}
+
+	public ArrayList<Item> getListOfItems() {
+		ArrayList<Item> tempList = new ArrayList<Item>();
+		for (int row = 0; row < gridHeight; row++) {
+			for (int col = 0; col < gridWidth; col++) {
+				if (grid[row][col].getCurrentItem() != null) {
+					Item tempItem = grid[row][col].getCurrentItem().copyMe();
+					tempList.add(tempItem);
+				}
+			}
+		}
+		return tempList;
 	}
 
 	public void draw() {
