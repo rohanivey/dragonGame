@@ -34,7 +34,32 @@ public class CharacterCreationState implements ApplicationListener {
 	private TextButton tb;
 
 	private String tempFirst, tempSecond;
-	private int tempStr, tempWis, tempInt, tempAgi, tempVit;
+
+	private int tempStr, tempWis, tempInt, tempAgi, tempVit, pointsToSpend;
+	TextButton minusStr;
+	TextButton plusStr;
+	TextButton minusWis;
+	TextButton plusWis;
+	TextButton minusInt;
+	TextButton plusInt;
+	TextButton minusAgi;
+	TextButton plusAgi;
+	TextButton minusVit;
+	TextButton plusVit;
+
+	Label pTS;
+	Label str;
+	Label wis;
+	Label intel;
+	Label agi;
+	Label vit;
+
+	Label pointsText;
+	Label strText;
+	Label wisText;
+	Label intelText;
+	Label agiText;
+	Label vitText;
 
 	// Debug
 	ShapeRenderer sr;
@@ -46,6 +71,7 @@ public class CharacterCreationState implements ApplicationListener {
 	@Override
 	public void create() {
 		currentPage = Process.makeName;
+		pointsToSpend = 6;
 		skin = new Skin(Gdx.files.internal("Character Creation/uiskin.json"));
 		skin.getFont("default-font").setColor(Color.WHITE);
 		sr = new ShapeRenderer();
@@ -108,28 +134,34 @@ public class CharacterCreationState implements ApplicationListener {
 		mainTable = new Table(skin);
 		stage.addActor(mainTable);
 		mainTable.setFillParent(true);
-		TextButton minusStr = new TextButton("-", skin);
-		TextButton plusStr = new TextButton("+", skin);
-		TextButton minusWis = new TextButton("-", skin);
-		TextButton plusWis = new TextButton("+", skin);
-		TextButton minusInt = new TextButton("-", skin);
-		TextButton plusInt = new TextButton("+", skin);
-		TextButton minusAgi = new TextButton("-", skin);
-		TextButton plusAgi = new TextButton("+", skin);
-		TextButton minusVit = new TextButton("-", skin);
-		TextButton plusVit = new TextButton("+", skin);
+		minusStr = new TextButton("-", skin);
+		plusStr = new TextButton("+", skin);
+		minusWis = new TextButton("-", skin);
+		plusWis = new TextButton("+", skin);
+		minusInt = new TextButton("-", skin);
+		plusInt = new TextButton("+", skin);
+		minusAgi = new TextButton("-", skin);
+		plusAgi = new TextButton("+", skin);
+		minusVit = new TextButton("-", skin);
+		plusVit = new TextButton("+", skin);
 
-		Label str = new Label(String.valueOf(tempStr), skin, "default");
-		Label wis = new Label(String.valueOf(tempWis), skin, "default");
-		Label intel = new Label(String.valueOf(tempInt), skin, "default");
-		Label agi = new Label(String.valueOf(tempAgi), skin, "default");
-		Label vit = new Label(String.valueOf(tempVit), skin, "default");
+		pTS = new Label(String.valueOf(pointsToSpend), skin, "default");
+		str = new Label(String.valueOf(tempStr), skin, "default");
+		wis = new Label(String.valueOf(tempWis), skin, "default");
+		intel = new Label(String.valueOf(tempInt), skin, "default");
+		agi = new Label(String.valueOf(tempAgi), skin, "default");
+		vit = new Label(String.valueOf(tempVit), skin, "default");
 
-		Label strText = new Label("Strength: ", skin, "default");
-		Label wisText = new Label("Wisdom: ", skin, "default");
-		Label intelText = new Label("Intelligence: ", skin, "default");
-		Label agiText = new Label("Agility: ", skin, "default");
-		Label vitText = new Label("Vitality: ", skin, "default");
+		pointsText = new Label("Points to spend: ", skin, "default");
+		strText = new Label("Strength: ", skin, "default");
+		wisText = new Label("Wisdom: ", skin, "default");
+		intelText = new Label("Intelligence: ", skin, "default");
+		agiText = new Label("Agility: ", skin, "default");
+		vitText = new Label("Vitality: ", skin, "default");
+
+		mainTable.add(pointsText);
+		mainTable.add(pTS).uniform();
+		mainTable.row();
 
 		mainTable.add(strText).uniform();
 		mainTable.add(minusStr).uniform();
@@ -161,8 +193,170 @@ public class CharacterCreationState implements ApplicationListener {
 		mainTable.add(plusVit);
 		mainTable.row();
 
+		assignStatArrowButtons();
+
+		tb = new TextButton("Next", skin);
+		mainTable.add(tb).expand().bottom().right();
+
+		defineNextButton(tb);
+
 		currentPage = Process.makeStats;
 
+	}
+
+	public void assignStatArrowButtons() {
+		plusStr.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int plusStr) {
+				if (pointsToSpend > 0) {
+					tempStr += 1;
+					System.out.println(tempStr);
+					pointsToSpend -= 1;
+					str.setText(String.valueOf(tempStr));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		minusStr.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int minusStr) {
+				if (tempStr > 0) {
+					tempStr -= 1;
+					pointsToSpend += 1;
+					str.setText(String.valueOf(tempStr));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+		plusWis.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int plusWis) {
+				if (pointsToSpend > 0) {
+					tempWis += 1;
+					System.out.println(tempWis);
+					pointsToSpend -= 1;
+					wis.setText(String.valueOf(tempWis));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		minusWis.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int minusWis) {
+				if (tempWis > 0) {
+					tempWis -= 1;
+					pointsToSpend += 1;
+					wis.setText(String.valueOf(tempWis));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+		plusInt.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int plusInt) {
+				if (pointsToSpend > 0) {
+					tempInt += 1;
+					System.out.println(tempInt);
+					pointsToSpend -= 1;
+					intel.setText(String.valueOf(tempInt));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		minusInt.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int minusInt) {
+				if (tempInt > 0) {
+					tempInt -= 1;
+					pointsToSpend += 1;
+					intel.setText(String.valueOf(tempInt));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		plusAgi.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int plusAgi) {
+				if (pointsToSpend > 0) {
+					tempAgi += 1;
+					System.out.println(tempAgi);
+					pointsToSpend -= 1;
+					agi.setText(String.valueOf(tempAgi));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		minusAgi.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int minusAgi) {
+				if (tempAgi > 0) {
+					tempAgi -= 1;
+					pointsToSpend += 1;
+					agi.setText(String.valueOf(tempAgi));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		plusVit.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int plusVit) {
+				if (pointsToSpend > 0) {
+					tempVit += 1;
+					System.out.println(tempVit);
+					pointsToSpend -= 1;
+					vit.setText(String.valueOf(tempVit));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
+
+		minusVit.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int minusVit) {
+				if (tempVit > 0) {
+					tempVit -= 1;
+					pointsToSpend += 1;
+					vit.setText(String.valueOf(tempVit));
+					pTS.setText(String.valueOf(pointsToSpend));
+				}
+				// else play buzz or something
+				return true;
+			}
+		});
 	}
 
 	public void makeNameSetup() {
@@ -215,19 +409,19 @@ public class CharacterCreationState implements ApplicationListener {
 		final Table tempTable = new Table(skin);
 		tempTable.setFillParent(true);
 		mainTable.setVisible(false);
+		Label tempLabel;
+		TextButton yesButton;
+		TextButton noButton;
 		switch (currentPage) {
 		case makeName:
-
-			System.out.println(tb.isDisabled());
-
-			Label tempLabel = new Label("Are you sure you are " + tempFirst
-					+ " " + tempSecond + "?", skin);
-			TextButton yesButton = new TextButton("Yes", skin);
-			TextButton noButton = new TextButton("No", skin);
+			tempLabel = new Label("Are you sure you are " + tempFirst + " "
+					+ tempSecond + "?", skin);
+			yesButton = new TextButton("Yes", skin);
+			noButton = new TextButton("No", skin);
 
 			tempTable.add(tempLabel);
 			tempTable.row();
-			tempTable.add(yesButton).uniform();
+			tempTable.add(yesButton);
 			tempTable.add(noButton).uniform();
 			stage.addActor(tempTable);
 			tempTable.toFront();
@@ -251,6 +445,36 @@ public class CharacterCreationState implements ApplicationListener {
 			});
 			break;
 		case makeStats:
+			tempLabel = new Label("Are you happy with what you can do?", skin,
+					"default");
+			yesButton = new TextButton("Yes", skin);
+			noButton = new TextButton("No", skin);
+
+			tempTable.add(tempLabel);
+			tempTable.row();
+			tempTable.add(yesButton).uniform();
+			tempTable.add(noButton).uniform();
+			stage.addActor(tempTable);
+			tempTable.toFront();
+
+			yesButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int yesButton) {
+					makeFeatsSetup();
+					return true;
+				}
+			});
+			noButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int noButton) {
+					mainTable.setVisible(true);
+					tempTable.remove();
+					return true;
+				}
+			});
+
 			break;
 		case makeFeats:
 			break;
@@ -301,4 +525,6 @@ public class CharacterCreationState implements ApplicationListener {
 		}
 	}
 
+	public void makeFeatsSetup() {
+	}
 }
