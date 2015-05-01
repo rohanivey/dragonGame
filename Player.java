@@ -72,7 +72,7 @@ public class Player {
 
 	protected InventoryManager im;
 
-	protected int str, wis, intel, agility;
+	protected int str, wis, intel, agility, vit;
 
 	protected int coins = 150;
 
@@ -132,7 +132,14 @@ public class Player {
 		reader = new XmlReader();
 		readData();
 
+		System.out.println("Player Stats: ");
+		System.out.println("Strength: " + str);
+		System.out.println("Intelligence: " + intel);
+		System.out.println("Wisdom: " + wis);
+		System.out.println("Agility: " + agility);
+		System.out.println("Coins: " + coins);
 		speed = agility;
+		System.out.println("Speed: " + speed);
 
 		characterKnowledge = new String[1000][100];
 		characterKnowledge[0][0] = "thyself";
@@ -219,6 +226,7 @@ public class Player {
 			wis = stats.getInt("Wisdom");
 			intel = stats.getInt("Intelligence");
 			agility = stats.getInt("Agility");
+			vit = stats.getInt("Vitality");
 		} catch (IOException e) {
 			System.out.println("Player.readStats() could find no file");
 			e.printStackTrace();
@@ -229,7 +237,8 @@ public class Player {
 	public void readItems() {
 		Element root;
 		try {
-			root = reader.parse(Gdx.files.internal("player.xml"));
+			// TODO: FIX THIS TO BE LOCAL, NOT INTERNAL
+			root = reader.parse(Gdx.files.local("player.xml"));
 			Element inventory = root.getChildByName("Inventory");
 			coins = inventory.getInt("Coins");
 			Element items = inventory.getChildByName("Items");
@@ -426,6 +435,8 @@ public class Player {
 					this.getCollision().height);
 			if (Intersector.overlaps(tempCollision, z.getRectangle())
 					&& z instanceof TeleZone) {
+
+				writeData();
 				System.out
 						.println("Player.checkLevelChange is getting a zone change of the type "
 								+ ((TeleZone) z).getType());

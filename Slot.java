@@ -129,15 +129,16 @@ public class Slot {
 
 		switch (currentType) {
 		case UNUSED:
-			myIM.sb.draw(img, widthLoc * slotWidth + startingX, heightLoc
-					* slotHeight + startingY);
+			myIM.getSpriteBatch().draw(img, widthLoc * slotWidth + startingX,
+					heightLoc * slotHeight + startingY);
 			// font.draw(myIM.sb, "[" + inputRow + ", " + inputCol + "]: U",
 			// widthLoc * (slotWidth+32), heightLoc * slotHeight+320);
 			break;
 		case MASTER:
-			myIM.sb.draw(currentItem.getTexture(), widthLoc * slotWidth
-					+ startingX, heightLoc * slotHeight + startingY, slotWidth
-					* currentItem.getGridWidth(),
+			myIM.getSpriteBatch().draw(currentItem.getTexture(),
+					widthLoc * slotWidth + startingX,
+					heightLoc * slotHeight + startingY,
+					slotWidth * currentItem.getGridWidth(),
 					slotHeight * currentItem.getGridHeight());
 			// font.draw(myIM.sb,"[" + inputRow + ", " + inputCol + "]:M",
 			// widthLoc * (slotWidth+32), heightLoc * slotHeight+320);

@@ -7,6 +7,7 @@ public class GameStateManager {
 	private MenuState menu;
 	private MenuState options;
 	private MainState mainGame;
+	private CharacterCreationState characterCreation;
 
 	private float ticks;
 	private float frames;
@@ -17,7 +18,7 @@ public class GameStateManager {
 	private State currentState = State.MainMenu;
 
 	private enum State {
-		MainMenu, OptionsMenu, Play, Inventory
+		MainMenu, OptionsMenu, Play, CharacterCreation
 	}
 
 	public GameStateManager() {
@@ -28,6 +29,7 @@ public class GameStateManager {
 
 		menu = new MenuState();
 		mainGame = new MainState();
+		characterCreation = new CharacterCreationState();
 
 		System.out.println("GameStateManager initialized");
 	}
@@ -59,6 +61,17 @@ public class GameStateManager {
 					mainGame.update();
 				}
 				break;
+
+			case CharacterCreation:
+				if (characterCreation.stateChange()) {
+					String tempString = menu.getState();
+					changeState(tempString);
+				} else {
+					// Due to buffering/clearing, don't update here since render
+					// also includes draw state for Scene2d
+					// characterCreation.render();
+				}
+				break;
 			// case Inventory:
 			// menu.update();
 			// break;
@@ -85,6 +98,9 @@ public class GameStateManager {
 		case Play:
 			mainGame.draw();
 			break;
+		case CharacterCreation:
+			characterCreation.render();
+			break;
 		default:
 			break;
 		}
@@ -101,6 +117,11 @@ public class GameStateManager {
 		case "Options":
 			currentState = State.OptionsMenu;
 			break;
+		case "Character Creation":
+			// currentState = State.CharacterCreation;
+			currentState = State.CharacterCreation;
+			break;
+
 		}
 	}
 

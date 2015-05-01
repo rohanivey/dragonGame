@@ -57,8 +57,8 @@ public class MainState extends GameState {
 	}
 
 	public Boolean changeLevel(Level inputLevel) {
-		paused = true;
 		System.out.println("MainState.changeLevel() has begun");
+		paused = true;
 		while (!setLevel(inputLevel)) {
 		}
 		paused = false;

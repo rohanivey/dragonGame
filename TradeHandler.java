@@ -148,8 +148,8 @@ public class TradeHandler {
 	}
 
 	public void exchangeGoods() {
-		for (int row = 0; row < tradeInventory.gridHeight; row++) {
-			for (int col = 0; col < tradeInventory.gridWidth; col++) {
+		for (int row = 0; row < tradeInventory.getGridHeight(); row++) {
+			for (int col = 0; col < tradeInventory.getGridWidth(); col++) {
 				// If the item in the slot is marked for trading
 				if (tradeInventory.getGrid()[row][col].getCurrentItem() != null) {
 					// If the item is owned by the player, it needs to go to the
@@ -212,8 +212,8 @@ public class TradeHandler {
 
 	public int getEntityTotal() {
 		int entityTotal = 0;
-		for (int row = 0; row < tradeInventory.gridHeight; row++) {
-			for (int col = 0; col < tradeInventory.gridWidth; col++) {
+		for (int row = 0; row < tradeInventory.getGridHeight(); row++) {
+			for (int col = 0; col < tradeInventory.getGridWidth(); col++) {
 				// If the item in the slot is marked for trading
 				if (tradeInventory.getGrid()[row][col].getCurrentItem() != null) {
 					if (tradeInventory.getGrid()[row][col].getCurrentItem()
@@ -250,8 +250,8 @@ public class TradeHandler {
 
 	public int getPlayerTotal() {
 		int playerTotal = 0;
-		for (int row = 0; row < tradeInventory.gridHeight; row++) {
-			for (int col = 0; col < tradeInventory.gridWidth; col++) {
+		for (int row = 0; row < tradeInventory.getGridHeight(); row++) {
+			for (int col = 0; col < tradeInventory.getGridWidth(); col++) {
 				// If the item in the slot is marked for trading
 				if (tradeInventory.getGrid()[row][col].getCurrentItem() != null) {
 					if (tradeInventory.getGrid()[row][col].getCurrentItem()

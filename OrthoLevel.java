@@ -93,12 +93,12 @@ public class OrthoLevel extends Level {
 						- player.getTradeHandler().getEntityTotal();
 				chatFont.draw(sb, "Player value: "
 						+ player.getTradeHandler().getPlayerTotal(), player
-						.getTradeHandler().getPICopy().startingX, player
-						.getTradeHandler().getPICopy().startingY - 64);
+						.getTradeHandler().getPICopy().getStartingX(), player
+						.getTradeHandler().getPICopy().getStartingY() - 64);
 				chatFont.draw(sb, "Entity value: "
 						+ player.getTradeHandler().getEntityTotal(), player
-						.getTradeHandler().getEICopy().startingX, player
-						.getTradeHandler().getEICopy().startingY - 64);
+						.getTradeHandler().getEICopy().getStartingX(), player
+						.getTradeHandler().getEICopy().getStartingY() - 64);
 				chatFont.draw(sb, "Profit: " + profit, player.getTradeHandler()
 						.getTrade().x
 						- player.getTradeHandler().getTradeButton().width / 2,
@@ -109,12 +109,12 @@ public class OrthoLevel extends Level {
 						- player.getTradeHandler().getPlayerTotal();
 				chatFont.draw(sb, "Player value: "
 						+ player.getTradeHandler().getPlayerTotal(), player
-						.getTradeHandler().getPICopy().startingX, player
-						.getTradeHandler().getPICopy().startingY - 64);
+						.getTradeHandler().getPICopy().getStartingX(), player
+						.getTradeHandler().getPICopy().getStartingY() - 64);
 				chatFont.draw(sb, "Entity value: "
 						+ player.getTradeHandler().getEntityTotal(), player
-						.getTradeHandler().getEICopy().startingX, player
-						.getTradeHandler().getEICopy().startingY - 64);
+						.getTradeHandler().getEICopy().getStartingX(), player
+						.getTradeHandler().getEICopy().getStartingY() - 64);
 				chatFont.draw(sb, "Cost: " + cost, player.getTradeHandler()
 						.getTrade().x
 						- player.getTradeHandler().getTradeButton().width / 2,
@@ -131,15 +131,15 @@ public class OrthoLevel extends Level {
 					"Player coins: "
 							+ String.valueOf(player.getTradeHandler()
 									.getPlayerCoins()), player
-							.getTradeHandler().getPICopy().startingX, player
-							.getTradeHandler().getPICopy().startingY - 32);
+							.getTradeHandler().getPICopy().getStartingX(),
+					player.getTradeHandler().getPICopy().getStartingY() - 32);
 			chatFont.draw(
 					sb,
 					"Entity coins: "
 							+ String.valueOf(player.getTradeHandler()
 									.getEntityCoins()), player
-							.getTradeHandler().getEICopy().startingX, player
-							.getTradeHandler().getEICopy().startingY - 32);
+							.getTradeHandler().getEICopy().getStartingX(),
+					player.getTradeHandler().getEICopy().getStartingY() - 32);
 			// chatFont.draw(sb, "Trade handler memory address: " +
 			// player.getTradeHandler().toString(), 100, 30);
 			sb.end();

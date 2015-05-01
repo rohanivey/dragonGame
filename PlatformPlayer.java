@@ -159,7 +159,9 @@ public class PlatformPlayer extends Player {
 		}
 
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
-			currentState = State.Inventory;
+			if (fs == floorState.onGround || fs == floorState.onLadder) {
+				currentState = State.Inventory;
+			}
 		}
 
 		if (Gdx.input.isKeyJustPressed(Keys.Q)) {

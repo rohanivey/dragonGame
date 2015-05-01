@@ -3,7 +3,10 @@ package com.rohan.dragonGame;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 public class InventoryManager {
 
@@ -14,15 +17,17 @@ public class InventoryManager {
 	private Cursor cursor;
 	private Slot slot;
 	private Player player;
-	int playerStr;
-	int playerWis;
-	int playerIntel;
-	int gridHeight;
-	int gridWidth;
-	int startingX;
-	int startingY;
-	SpriteBatch sb;
+	private int playerStr;
+	private int playerWis;
+	private int playerIntel;
+	private int gridHeight;
+	private int gridWidth;
+	private int startingX;
+	private int startingY;
+	private SpriteBatch sb;
 	private ownerType type;
+	private Rectangle dropButton;
+	private Sprite dropButtonSprite;
 
 	Boolean readyToDraw = false;
 
@@ -36,10 +41,15 @@ public class InventoryManager {
 		gridWidth = 8;
 		startingX = Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 3;
 		startingY = Gdx.graphics.getHeight() / 2;
-
 		sb = new SpriteBatch();
 		cursor = inputEntity.p.getInventoryManager().getCursor();
-
+		dropButtonSprite = new Sprite(new Texture(
+				Gdx.files.internal("trash.png")));
+		dropButton = new Rectangle(startingX + gridWidth + 96, startingY
+				+ gridHeight / 2, dropButtonSprite.getWidth(),
+				dropButtonSprite.getHeight());
+		dropButtonSprite.setX(dropButton.x);
+		dropButtonSprite.setY(dropButton.y);
 		grid = setupGrid();
 		readyToDraw = true;
 	}
@@ -55,8 +65,35 @@ public class InventoryManager {
 		cursor = inputCursor;
 		grid = copyGrid(originalGrid);
 		readyToDraw = true;
+		dropButtonSprite = new Sprite(new Texture(
+				Gdx.files.internal("trash.png")));
+		dropButton = new Rectangle(startingX + gridWidth + 96, startingY
+				+ gridHeight / 2, dropButtonSprite.getWidth(),
+				dropButtonSprite.getHeight());
+		dropButtonSprite.setX(dropButton.x);
+		dropButtonSprite.setY(dropButton.y);
 		System.out
 				.println("InventoryManager.Constructor for copyMe() has been created");
+	}
+
+	public int getStartingX() {
+		return startingX;
+	}
+
+	public int getStartingY() {
+		return startingY;
+	}
+
+	public int getGridHeight() {
+		return gridHeight;
+	}
+
+	public int getGridWidth() {
+		return gridWidth;
+	}
+
+	public SpriteBatch getSpriteBatch() {
+		return sb;
 	}
 
 	public InventoryManager(Player inputPlayer) {
@@ -84,6 +121,13 @@ public class InventoryManager {
 
 		grid = setupGrid();
 		readyToDraw = true;
+
+		dropButtonSprite = new Sprite(new Texture(
+				Gdx.files.internal("trash.png")));
+		dropButton = new Rectangle(startingX + 430, startingY + gridHeight / 2,
+				dropButtonSprite.getWidth(), dropButtonSprite.getHeight());
+		dropButtonSprite.setX(dropButton.x);
+		dropButtonSprite.setY(dropButton.y);
 	}
 
 	@SuppressWarnings("unused")
@@ -287,6 +331,10 @@ public class InventoryManager {
 		switch (type) {
 		case PLAYER:
 			cursor.draw();
+			// DIRTY HACK
+			sb.begin();
+			dropButtonSprite.draw(sb);
+			sb.end();
 			break;
 		default:
 			break;
@@ -372,14 +420,32 @@ public class InventoryManager {
 		return grid;
 	}
 
+	public void trashUpdate() {
+		if (dropButton.contains(cursor.getSprite().getX(), cursor.getSprite()
+				.getY())) {
+			if (cursor.getItem() != null) {
+				player.level.itemsOnScreen.add(new Item(cursor.getItem()
+						.getInputString(), "PLAYER", (int) player.getX(),
+						(int) player.getY()));
+				cursor.setItem(null);
+				cursor.defaultTexture();
+			}
+		}
+	}
+
 	public void update() {
 		// No matter what the grid needs to update
-		gridUpdate();
+		// Although it could be set to an if statement to preserve processing
+		// If onTouch() then gridUpdate()
+		if (Gdx.input.isTouched()) {
+			gridUpdate();
+		}
 		switch (type) {
 		case PLAYER:
 			// The player cursor will always be present. There won't be a cursor
 			// without a player.
 			cursor.update();
+			trashUpdate();
 			break;
 		case ENTITY:
 			// Use trade handler to do stuff, get cursor

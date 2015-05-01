@@ -18,7 +18,7 @@ public class MenuState extends GameState {
 	private Boolean changeState = false;
 
 	private enum State {
-		Options, Play
+		Options, Play, CharacterCreation
 	}
 
 	private State newState;
@@ -40,7 +40,8 @@ public class MenuState extends GameState {
 	@Override
 	public void update() {
 		timer += Gdx.graphics.getDeltaTime();
-		if (Gdx.input.isKeyPressed(Keys.ENTER)) {
+		if (Gdx.input.isKeyPressed(Keys.ENTER)
+				|| Gdx.input.isKeyPressed(Keys.E)) {
 			select();
 		} else if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
 			System.out.println("Escape pressed");
@@ -85,7 +86,7 @@ public class MenuState extends GameState {
 		// New Game
 		case 0:
 			// Swap state to MainState
-			newState = State.Play;
+			newState = State.CharacterCreation;
 			break;
 		// Options
 		case 1:
@@ -112,6 +113,9 @@ public class MenuState extends GameState {
 			break;
 		case Options:
 			returnString = "Options";
+			break;
+		case CharacterCreation:
+			returnString = "Character Creation";
 			break;
 		}
 		return returnString;
