@@ -23,6 +23,7 @@ public class Feat {
 	private ArrayList<String> itemRequirements = new ArrayList<String>();
 	private ArrayList<String> questRequirements = new ArrayList<String>();
 	private Player player;
+	private String img;
 
 	public Feat(String inputID) {
 		id = inputID;
@@ -70,6 +71,7 @@ public class Feat {
 		Element activeElement = inputElement;
 		this.name = activeElement.get("Name");
 		this.description = activeElement.get("Description");
+		img = activeElement.get("Texture");
 		Element requirements = activeElement.getChildByName("Requirements");
 		Array<Element> minStats = requirements.getChildrenByName("MinStats");
 		for (Element e : minStats) {
@@ -142,6 +144,10 @@ public class Feat {
 
 	public Boolean questCheck() {
 		return true;
+	}
+
+	public String getImg() {
+		return img;
 	}
 
 	public Boolean itemCheck() {

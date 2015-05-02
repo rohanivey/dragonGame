@@ -32,4 +32,8 @@ public class FeatManager {
 		}
 	}
 
+	public ArrayList<Feat> getFeatList() {
+		return featList;
+	}
+
 }

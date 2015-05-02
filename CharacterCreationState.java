@@ -3,12 +3,15 @@ package com.rohan.dragonGame;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -28,6 +31,7 @@ public class CharacterCreationState implements ApplicationListener {
 	private Skin skin;
 
 	private Table mainTable;
+	private ScrollPane scroll;
 
 	private Process currentPage;
 
@@ -62,6 +66,11 @@ public class CharacterCreationState implements ApplicationListener {
 	Label intelText;
 	Label agiText;
 	Label vitText;
+
+	FeatManager tempFeatManager;
+	Image featImage;
+	Label featDescription;
+	Label featRequirement;
 
 	// Debug
 	ShapeRenderer sr;
@@ -375,12 +384,77 @@ public class CharacterCreationState implements ApplicationListener {
 
 	public void makeFeatsSetup() {
 		stage = new Stage();
+		tempFeatManager = new FeatManager(tempPlayer);
 		Gdx.input.setInputProcessor(stage);
 		mainTable = new Table(skin);
-		mainTable.setFillParent(true);
 		stage.addActor(mainTable);
 
-		FeatManager tempFeatManager = new FeatManager(tempPlayer);
+		Table featTable = new Table(skin);
+		Texture tempImg = new Texture(tempFeatManager.getFeatList().get(0)
+				.getImg());
+		featImage = new Image(tempImg);
+
+		featRequirement = new Label("", skin, "default");
+		featDescription = new Label("", skin, "default");
+		for (final Feat f : tempFeatManager.getFeatList()) {
+			Button tempButton = new TextButton(f.getName(), skin);
+			tempButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int tempButton) {
+					Image newImage = new Image(new Texture(f.getImg()));
+					featImage = newImage;
+					featDescription.setText(f.getDescription());
+
+					return true;
+				}
+			});
+			featTable.add(tempButton);
+		}
+
+		scroll = new ScrollPane(featTable);
+		scroll.setScrollBarPositions(false, true);
+		// scroll.setSize(featTable.getWidth(), featTable.getHeight());
+
+		Label titleLabel = new Label("Choose a Feat", skin, "default");
+
+		/*
+		 * titleLabel.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()
+		 * / 10f); featTable.setSize(Gdx.graphics.getWidth() / 2,
+		 * Gdx.graphics.getHeight() * 0.40f);
+		 * featImage.setSize(Gdx.graphics.getWidth() / 2,
+		 * Gdx.graphics.getHeight() * 0.40f);
+		 * featRequirement.setSize(Gdx.graphics.getWidth(),
+		 * Gdx.graphics.getHeight() / 10f);
+		 * featDescription.setSize(Gdx.graphics.getWidth(),
+		 * Gdx.graphics.getHeight() / 5f);
+		 */
+
+		/*
+		 * mainTable.add(titleLabel) .size(Gdx.graphics.getWidth(),
+		 * Gdx.graphics.getHeight() / 10f) .row();
+		 * mainTable.add(scroll).size(Gdx.graphics.getWidth() / 2,
+		 * Gdx.graphics.getHeight() * 0.40f); mainTable .add(featImage)
+		 * .size(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() *
+		 * 0.40f).row(); mainTable.add(featRequirement)
+		 * .size(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 10f)
+		 * .row(); mainTable.add(featDescription).size(Gdx.graphics.getWidth(),
+		 * Gdx.graphics.getHeight() / 5f);
+		 */
+
+		mainTable.setFillParent(true);
+		mainTable.add(titleLabel).center().colspan(2).row();
+		mainTable.add(scroll).center().expandX().fillX()
+				.width(Gdx.graphics.getWidth() / 2);
+		mainTable.add(featImage).expandX().fillX()
+				.width(Gdx.graphics.getWidth() / 2)
+				.height(Gdx.graphics.getHeight() * 0.40f).row();
+		mainTable.add(featRequirement).width(Gdx.graphics.getWidth())
+				.height(Gdx.graphics.getHeight() / 10).expandX().colspan(2)
+				.row();
+		mainTable.add(featDescription).expand().fill().colspan(2).row();
+
+		stage.setDebugAll(true);
 
 	}
 
@@ -506,6 +580,7 @@ public class CharacterCreationState implements ApplicationListener {
 		defineNextButton(tb);
 
 		currentPage = Process.makeStats;
+		mainTable.setDebug(true);
 
 	}
 
