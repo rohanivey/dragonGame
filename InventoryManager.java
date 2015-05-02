@@ -103,9 +103,9 @@ public class InventoryManager {
 
 		type = ownerType.PLAYER;
 
-		playerStr = player.getStats("str");
-		playerWis = player.getStats("wis");
-		playerIntel = player.getStats("intel");
+		playerStr = player.getStats("Strength");
+		playerWis = player.getStats("Wisdom");
+		playerIntel = player.getStats("Intelligence");
 
 		// I'm certain there is a very simple solution to this problem
 		// But I'm running low on coffee and the Red Cross won't consider that

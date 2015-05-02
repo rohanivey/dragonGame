@@ -2,6 +2,7 @@ package com.rohan.dragonGame;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
@@ -82,6 +83,12 @@ public class Player {
 	protected XmlWriter writer;
 	protected FileHandle file;
 
+	protected ArrayList<Feat> featList = new ArrayList<Feat>();
+	protected String firstName, lastName;
+
+	public Player() {
+	}
+
 	public Player(int inputX, int inputY, Level inputLevel) {
 
 		location = new Vector2(inputX, inputY);
@@ -144,6 +151,18 @@ public class Player {
 		characterKnowledge = new String[1000][100];
 		characterKnowledge[0][0] = "thyself";
 
+	}
+
+	public void addFeat(Feat inputFeat) {
+		featList.add(inputFeat);
+	}
+
+	public void setFirstName(String inputString) {
+		firstName = inputString;
+	}
+
+	public void setLastName(String inputString) {
+		lastName = inputString;
 	}
 
 	public void checkChatting() {
@@ -522,14 +541,39 @@ public class Player {
 
 	{
 		switch (inputStat) {
-		case "str":
+		case "Strength":
 			return str;
-		case "wis":
+		case "Wisdom":
 			return wis;
-		case "intel":
+		case "Intelligence":
 			return intel;
+		case "Agility":
+			return agility;
+		case "Vitality":
+			return vit;
 		}
 		return 0;
+
+	}
+
+	public void setStats(String inputStat, int inputInt) {
+		switch (inputStat) {
+		case "Strength":
+			str += inputInt;
+			break;
+		case "Wisdom":
+			wis += inputInt;
+			break;
+		case "Intelligence":
+			intel += inputInt;
+			break;
+		case "Agility":
+			agility += inputInt;
+			break;
+		case "Vitality":
+			vit += inputInt;
+			break;
+		}
 	}
 
 	public Texture getTexture() {

@@ -16,16 +16,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 
 public class CharacterCreationState implements ApplicationListener {
 
-	private String newState;
-	private Boolean changeState = false;
-
-	private Stage stage;
-	private Skin skin;
-	private Table mainTable;
-
 	private enum Process {
 		makeName, makeStats, makeFeats, makeSprite, makeOverview
 	}
+
+	private String newState;
+	private Boolean changeState = false;
+
+	private Player tempPlayer;
+	private Stage stage;
+	private Skin skin;
+
+	private Table mainTable;
 
 	private Process currentPage;
 
@@ -66,142 +68,6 @@ public class CharacterCreationState implements ApplicationListener {
 
 	public CharacterCreationState() {
 		create();
-	}
-
-	@Override
-	public void create() {
-		currentPage = Process.makeName;
-		pointsToSpend = 6;
-		skin = new Skin(Gdx.files.internal("Character Creation/uiskin.json"));
-		skin.getFont("default-font").setColor(Color.WHITE);
-		sr = new ShapeRenderer();
-		makeNameSetup();
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void render() {
-		stage.act(Gdx.graphics.getDeltaTime());
-
-		// sb.setProjectionMatrix(cam.combined);
-		// System.out.println("drawing");
-		stage.draw();
-
-		// sr.setProjectionMatrix(cam.combined);
-		sr.setAutoShapeType(true);
-		sr.setColor(Color.WHITE);
-		sr.begin();
-		// mainTable.drawDebug(sr);
-		sr.end();
-	}
-
-	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public Boolean stateChange() {
-		return changeState;
-	}
-
-	public String getState() {
-		return newState;
-	}
-
-	public void makeStatsSetup() {
-
-		stage.dispose();
-
-		stage = new Stage();
-		Gdx.input.setInputProcessor(stage);
-		mainTable = new Table(skin);
-		stage.addActor(mainTable);
-		mainTable.setFillParent(true);
-		minusStr = new TextButton("-", skin);
-		plusStr = new TextButton("+", skin);
-		minusWis = new TextButton("-", skin);
-		plusWis = new TextButton("+", skin);
-		minusInt = new TextButton("-", skin);
-		plusInt = new TextButton("+", skin);
-		minusAgi = new TextButton("-", skin);
-		plusAgi = new TextButton("+", skin);
-		minusVit = new TextButton("-", skin);
-		plusVit = new TextButton("+", skin);
-
-		pTS = new Label(String.valueOf(pointsToSpend), skin, "default");
-		str = new Label(String.valueOf(tempStr), skin, "default");
-		wis = new Label(String.valueOf(tempWis), skin, "default");
-		intel = new Label(String.valueOf(tempInt), skin, "default");
-		agi = new Label(String.valueOf(tempAgi), skin, "default");
-		vit = new Label(String.valueOf(tempVit), skin, "default");
-
-		pointsText = new Label("Points to spend: ", skin, "default");
-		strText = new Label("Strength: ", skin, "default");
-		wisText = new Label("Wisdom: ", skin, "default");
-		intelText = new Label("Intelligence: ", skin, "default");
-		agiText = new Label("Agility: ", skin, "default");
-		vitText = new Label("Vitality: ", skin, "default");
-
-		mainTable.add(pointsText);
-		mainTable.add(pTS).uniform();
-		mainTable.row();
-
-		mainTable.add(strText).uniform();
-		mainTable.add(minusStr).uniform();
-		mainTable.add(str);
-		mainTable.add(plusStr).uniform();
-		mainTable.row();
-
-		mainTable.add(wisText);
-		mainTable.add(minusWis);
-		mainTable.add(wis);
-		mainTable.add(plusWis);
-		mainTable.row();
-
-		mainTable.add(intelText);
-		mainTable.add(minusInt);
-		mainTable.add(intel);
-		mainTable.add(plusInt);
-		mainTable.row();
-
-		mainTable.add(agiText);
-		mainTable.add(minusAgi);
-		mainTable.add(agi);
-		mainTable.add(plusAgi);
-		mainTable.row();
-
-		mainTable.add(vitText);
-		mainTable.add(minusVit);
-		mainTable.add(vit);
-		mainTable.add(plusVit);
-		mainTable.row();
-
-		assignStatArrowButtons();
-
-		tb = new TextButton("Next", skin);
-		mainTable.add(tb).expand().bottom().right();
-
-		defineNextButton(tb);
-
-		currentPage = Process.makeStats;
-
 	}
 
 	public void assignStatArrowButtons() {
@@ -359,6 +225,165 @@ public class CharacterCreationState implements ApplicationListener {
 		});
 	}
 
+	@Override
+	public void create() {
+		currentPage = Process.makeName;
+		tempPlayer = new Player();
+		pointsToSpend = 6;
+		skin = new Skin(Gdx.files.internal("Character Creation/uiskin.json"));
+		skin.getFont("default-font").setColor(Color.WHITE);
+		sr = new ShapeRenderer();
+		makeNameSetup();
+	}
+
+	public void defineNextButton(Button inputButton) {
+		Button button = inputButton;
+
+		switch (currentPage) {
+		case makeFeats:
+			break;
+		case makeName:
+			button.addListener(new InputListener() {
+				// Triggered on pressing down
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					System.out.println("Button Hit");
+					tempFirst = firstNameTextField.getText();
+					tempSecond = secondNameTextField.getText();
+					doubleCheck();
+					return true;
+				}
+
+				// Triggered on release
+				public void touchUp() {
+
+				}
+			});
+			break;
+		case makeOverview:
+			break;
+		case makeSprite:
+			break;
+		case makeStats:
+			break;
+		default:
+			break;
+
+		}
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public Boolean doubleCheck() {
+		final Table tempTable = new Table(skin);
+		tempTable.setFillParent(true);
+		mainTable.setVisible(false);
+		Label tempLabel;
+		TextButton yesButton;
+		TextButton noButton;
+		switch (currentPage) {
+		case makeName:
+			tempLabel = new Label("Are you sure you are " + tempFirst + " "
+					+ tempSecond + "?", skin);
+			yesButton = new TextButton("Yes", skin);
+			noButton = new TextButton("No", skin);
+
+			tempTable.add(tempLabel);
+			tempTable.row();
+			tempTable.add(yesButton);
+			tempTable.add(noButton).uniform();
+			stage.addActor(tempTable);
+			tempTable.toFront();
+
+			yesButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int yesButton) {
+					tempPlayer.setFirstName(tempFirst);
+					tempPlayer.setLastName(tempSecond);
+					makeStatsSetup();
+					return true;
+				}
+			});
+			noButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int noButton) {
+					mainTable.setVisible(true);
+					tempTable.remove();
+					return true;
+				}
+			});
+			break;
+		case makeStats:
+			tempLabel = new Label("Are you happy with what you can do?", skin,
+					"default");
+			yesButton = new TextButton("Yes", skin);
+			noButton = new TextButton("No", skin);
+
+			tempTable.add(tempLabel);
+			tempTable.row();
+			tempTable.add(yesButton).uniform();
+			tempTable.add(noButton).uniform();
+			stage.addActor(tempTable);
+			tempTable.toFront();
+
+			yesButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int yesButton) {
+					tempPlayer.setStats("Strength", tempStr);
+					tempPlayer.setStats("Wisdom", tempWis);
+					tempPlayer.setStats("Intelligence", tempInt);
+					tempPlayer.setStats("Agility", tempAgi);
+					tempPlayer.setStats("Vitality", tempVit);
+					makeFeatsSetup();
+					return true;
+				}
+			});
+			noButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int noButton) {
+					mainTable.setVisible(true);
+					tempTable.remove();
+					return true;
+				}
+			});
+
+			break;
+		case makeFeats:
+			break;
+		case makeSprite:
+			break;
+		case makeOverview:
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+
+	public String getState() {
+		return newState;
+	}
+
+	public void makeFeatsSetup() {
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		mainTable = new Table(skin);
+		mainTable.setFillParent(true);
+		stage.addActor(mainTable);
+
+		FeatManager tempFeatManager = new FeatManager(tempPlayer);
+
+	}
+
 	public void makeNameSetup() {
 		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
@@ -405,126 +430,119 @@ public class CharacterCreationState implements ApplicationListener {
 		stage.setDebugAll(true);
 	}
 
-	public Boolean doubleCheck() {
-		final Table tempTable = new Table(skin);
-		tempTable.setFillParent(true);
-		mainTable.setVisible(false);
-		Label tempLabel;
-		TextButton yesButton;
-		TextButton noButton;
-		switch (currentPage) {
-		case makeName:
-			tempLabel = new Label("Are you sure you are " + tempFirst + " "
-					+ tempSecond + "?", skin);
-			yesButton = new TextButton("Yes", skin);
-			noButton = new TextButton("No", skin);
+	public void makeStatsSetup() {
 
-			tempTable.add(tempLabel);
-			tempTable.row();
-			tempTable.add(yesButton);
-			tempTable.add(noButton).uniform();
-			stage.addActor(tempTable);
-			tempTable.toFront();
+		stage.dispose();
 
-			yesButton.addListener(new InputListener() {
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y,
-						int pointer, int yesButton) {
-					makeStatsSetup();
-					return true;
-				}
-			});
-			noButton.addListener(new InputListener() {
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y,
-						int pointer, int noButton) {
-					mainTable.setVisible(true);
-					tempTable.remove();
-					return true;
-				}
-			});
-			break;
-		case makeStats:
-			tempLabel = new Label("Are you happy with what you can do?", skin,
-					"default");
-			yesButton = new TextButton("Yes", skin);
-			noButton = new TextButton("No", skin);
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		mainTable = new Table(skin);
+		stage.addActor(mainTable);
+		mainTable.setFillParent(true);
+		minusStr = new TextButton("-", skin);
+		plusStr = new TextButton("+", skin);
+		minusWis = new TextButton("-", skin);
+		plusWis = new TextButton("+", skin);
+		minusInt = new TextButton("-", skin);
+		plusInt = new TextButton("+", skin);
+		minusAgi = new TextButton("-", skin);
+		plusAgi = new TextButton("+", skin);
+		minusVit = new TextButton("-", skin);
+		plusVit = new TextButton("+", skin);
 
-			tempTable.add(tempLabel);
-			tempTable.row();
-			tempTable.add(yesButton).uniform();
-			tempTable.add(noButton).uniform();
-			stage.addActor(tempTable);
-			tempTable.toFront();
+		pTS = new Label(String.valueOf(pointsToSpend), skin, "default");
+		str = new Label(String.valueOf(tempStr), skin, "default");
+		wis = new Label(String.valueOf(tempWis), skin, "default");
+		intel = new Label(String.valueOf(tempInt), skin, "default");
+		agi = new Label(String.valueOf(tempAgi), skin, "default");
+		vit = new Label(String.valueOf(tempVit), skin, "default");
 
-			yesButton.addListener(new InputListener() {
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y,
-						int pointer, int yesButton) {
-					makeFeatsSetup();
-					return true;
-				}
-			});
-			noButton.addListener(new InputListener() {
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y,
-						int pointer, int noButton) {
-					mainTable.setVisible(true);
-					tempTable.remove();
-					return true;
-				}
-			});
+		pointsText = new Label("Points to spend: ", skin, "default");
+		strText = new Label("Strength: ", skin, "default");
+		wisText = new Label("Wisdom: ", skin, "default");
+		intelText = new Label("Intelligence: ", skin, "default");
+		agiText = new Label("Agility: ", skin, "default");
+		vitText = new Label("Vitality: ", skin, "default");
 
-			break;
-		case makeFeats:
-			break;
-		case makeSprite:
-			break;
-		case makeOverview:
-			break;
-		default:
-			break;
-		}
-		return false;
+		mainTable.add(pointsText);
+		mainTable.add(pTS).uniform();
+		mainTable.row();
+
+		mainTable.add(strText).uniform();
+		mainTable.add(minusStr).uniform();
+		mainTable.add(str);
+		mainTable.add(plusStr).uniform();
+		mainTable.row();
+
+		mainTable.add(wisText);
+		mainTable.add(minusWis);
+		mainTable.add(wis);
+		mainTable.add(plusWis);
+		mainTable.row();
+
+		mainTable.add(intelText);
+		mainTable.add(minusInt);
+		mainTable.add(intel);
+		mainTable.add(plusInt);
+		mainTable.row();
+
+		mainTable.add(agiText);
+		mainTable.add(minusAgi);
+		mainTable.add(agi);
+		mainTable.add(plusAgi);
+		mainTable.row();
+
+		mainTable.add(vitText);
+		mainTable.add(minusVit);
+		mainTable.add(vit);
+		mainTable.add(plusVit);
+		mainTable.row();
+
+		assignStatArrowButtons();
+
+		tb = new TextButton("Next", skin);
+		mainTable.add(tb).expand().bottom().right();
+
+		defineNextButton(tb);
+
+		currentPage = Process.makeStats;
+
 	}
 
-	public void defineNextButton(Button inputButton) {
-		Button button = inputButton;
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
 
-		switch (currentPage) {
-		case makeFeats:
-			break;
-		case makeName:
-			button.addListener(new InputListener() {
-				// Triggered on pressing down
-				@Override
-				public boolean touchDown(InputEvent event, float x, float y,
-						int pointer, int button) {
-					System.out.println("Button Hit");
-					tempFirst = firstNameTextField.getText();
-					tempSecond = secondNameTextField.getText();
-					doubleCheck();
-					return true;
-				}
-
-				// Triggered on release
-				public void touchUp() {
-
-				}
-			});
-			break;
-		case makeOverview:
-			break;
-		case makeSprite:
-			break;
-		case makeStats:
-			break;
-		default:
-			break;
-
-		}
 	}
 
-	public void makeFeatsSetup() {
+	@Override
+	public void render() {
+		stage.act(Gdx.graphics.getDeltaTime());
+
+		// sb.setProjectionMatrix(cam.combined);
+		// System.out.println("drawing");
+		stage.draw();
+
+		// sr.setProjectionMatrix(cam.combined);
+		sr.setAutoShapeType(true);
+		sr.setColor(Color.WHITE);
+		sr.begin();
+		// mainTable.drawDebug(sr);
+		sr.end();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public Boolean stateChange() {
+		return changeState;
 	}
 }
