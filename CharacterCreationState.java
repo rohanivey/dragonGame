@@ -1,10 +1,16 @@
 package com.rohan.dragonGame;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
 public class CharacterCreationState implements ApplicationListener {
 
@@ -71,6 +78,24 @@ public class CharacterCreationState implements ApplicationListener {
 	Image featImage;
 	Label featDescription;
 	Label featRequirement;
+	Feat currentFeat;
+
+	private Sprite hairSprite;
+	TextureRegion[][] tempHairs;
+	private int hairChoice = 0;
+	TextButton minusHair;
+	TextButton minusEyes;
+	TextButton minusMouth;
+
+	TextButton plusHair;
+	TextButton plusEyes;
+	TextButton plusMouth;
+
+	Image hairImage;
+	Image eyeImage;
+	Image mouthImage;
+
+	ArrayList<Actor> actorList = new ArrayList<Actor>();
 
 	// Debug
 	ShapeRenderer sr;
@@ -250,6 +275,16 @@ public class CharacterCreationState implements ApplicationListener {
 
 		switch (currentPage) {
 		case makeFeats:
+			button.addListener(new InputListener() {
+				// Triggered on pressing down
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					System.out.println("Button Hit");
+					doubleCheck();
+					return true;
+				}
+			});
 			break;
 		case makeName:
 			button.addListener(new InputListener() {
@@ -273,8 +308,28 @@ public class CharacterCreationState implements ApplicationListener {
 		case makeOverview:
 			break;
 		case makeSprite:
+			button.addListener(new InputListener() {
+				// Triggered on pressing down
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					System.out.println("Button Hit");
+					doubleCheck();
+					return true;
+				}
+			});
 			break;
 		case makeStats:
+			button.addListener(new InputListener() {
+				// Triggered on pressing down
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int button) {
+					System.out.println("Button Hit");
+					doubleCheck();
+					return true;
+				}
+			});
 			break;
 		default:
 			break;
@@ -284,7 +339,6 @@ public class CharacterCreationState implements ApplicationListener {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -292,6 +346,7 @@ public class CharacterCreationState implements ApplicationListener {
 		final Table tempTable = new Table(skin);
 		tempTable.setFillParent(true);
 		mainTable.setVisible(false);
+
 		Label tempLabel;
 		TextButton yesButton;
 		TextButton noButton;
@@ -367,8 +422,78 @@ public class CharacterCreationState implements ApplicationListener {
 
 			break;
 		case makeFeats:
+			tempLabel = new Label("Are you sure you want to choose "
+					+ currentFeat.getName(), skin, "default");
+			yesButton = new TextButton("Yes", skin);
+			noButton = new TextButton("No", skin);
+
+			tempTable.add(tempLabel);
+			tempTable.row();
+			tempTable.add(yesButton).uniform();
+			tempTable.add(noButton).uniform();
+			stage.addActor(tempTable);
+			tempTable.toFront();
+
+			yesButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int yesButton) {
+					tempPlayer.addFeat(currentFeat);
+					makeSpriteSetup();
+					return true;
+				}
+			});
+			noButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int noButton) {
+					mainTable.setVisible(true);
+					tempTable.remove();
+					return true;
+				}
+			});
 			break;
 		case makeSprite:
+
+			for (Actor a : actorList) {
+				a.setVisible(false);
+			}
+
+			tempLabel = new Label("Looking good?", skin, "default");
+			yesButton = new TextButton("Yes", skin);
+			noButton = new TextButton("No", skin);
+
+			tempTable.add(tempLabel);
+			tempTable.row();
+			tempTable.add(yesButton).uniform();
+			tempTable.add(noButton).uniform();
+			stage.addActor(tempTable);
+			tempTable.toFront();
+
+			yesButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int yesButton) {
+					changeState = true;
+					newState = "Play";
+					System.out
+							.println("MakeSprite yes button pressed in doublecheck");
+					// dispose();
+					return true;
+				}
+			});
+			noButton.addListener(new InputListener() {
+				@Override
+				public boolean touchDown(InputEvent event, float x, float y,
+						int pointer, int noButton) {
+					mainTable.setVisible(true);
+					for (Actor a : actorList) {
+						a.setVisible(true);
+					}
+					tempTable.remove();
+					return true;
+				}
+			});
 			break;
 		case makeOverview:
 			break;
@@ -382,9 +507,134 @@ public class CharacterCreationState implements ApplicationListener {
 		return newState;
 	}
 
-	public void makeFeatsSetup() {
+	public void makeSpriteSetup() {
+		stage.dispose();
+
 		stage = new Stage();
+		currentPage = Process.makeSprite;
+		Gdx.input.setInputProcessor(stage);
+		mainTable = new Table(skin);
+
+		tb = new TextButton("Next", skin);
+		tb.setX(Gdx.graphics.getWidth() - 64);
+		tb.setY(8);
+		stage.addActor(tb);
+
+		actorList.add(tb);
+
+		defineNextButton(tb);
+
+		Group bodyGroup = new Group();
+		Image paperDoll = new Image(new Texture(
+				Gdx.files.internal("character/front.png")));
+		bodyGroup.addActor(paperDoll);
+		bodyGroup.setSize(paperDoll.getWidth(), paperDoll.getHeight());
+		bodyGroup.setX(Gdx.graphics.getWidth() / 2 - bodyGroup.getWidth() / 2);
+		bodyGroup
+				.setY(Gdx.graphics.getHeight() / 2 - bodyGroup.getHeight() / 2);
+		System.out.println("Height " + bodyGroup.getHeight() / 2);
+		stage.addActor(bodyGroup);
+		actorList.add(bodyGroup);
+
+		Texture img = new Texture(Gdx.files.internal("character/hairAtlas.png"));
+		tempHairs = TextureRegion.split(img, 32, 64);
+		hairSprite = new Sprite(tempHairs[1][0]);
+
+		minusHair = new TextButton("<", skin);
+		plusHair = new TextButton(">", skin);
+		hairImage = new Image(hairSprite);
+
+		minusEyes = new TextButton("<", skin);
+		plusEyes = new TextButton(">", skin);
+		eyeImage = new Image(hairSprite);
+
+		minusMouth = new TextButton("<", skin);
+		plusMouth = new TextButton(">", skin);
+		mouthImage = new Image(hairSprite);
+
+		bodyGroup.addActor(eyeImage);
+		bodyGroup.addActor(mouthImage);
+		bodyGroup.addActor(hairImage);
+
+		int minusX = Gdx.graphics.getWidth() / 2 - 32;
+		int plusX = Gdx.graphics.getWidth() / 2 + 32;
+
+		int startY = Gdx.graphics.getHeight() / 2;
+
+		ArrayList<Actor> minusList = new ArrayList<Actor>();
+		ArrayList<Actor> plusList = new ArrayList<Actor>();
+
+		minusList.add(minusHair);
+		minusList.add(minusEyes);
+		minusList.add(minusMouth);
+
+		plusList.add(plusHair);
+		plusList.add(plusEyes);
+		plusList.add(plusMouth);
+
+		int tempInt = 0;
+
+		for (Actor a : minusList) {
+			a.setX(minusX);
+			a.setY(startY - tempInt * 32);
+			tempInt++;
+			stage.addActor(a);
+			System.out.println("Added actor " + a.toString() + " at "
+					+ a.getX() + ", " + a.getY());
+			actorList.add(a);
+		}
+
+		tempInt = 0;
+
+		for (Actor a : plusList) {
+			a.setX(plusX);
+			a.setY(startY - tempInt * 32);
+			tempInt++;
+			stage.addActor(a);
+			System.out.println("Added actor " + a.toString() + " at "
+					+ a.getX() + ", " + a.getY());
+			actorList.add(a);
+		}
+
+		stage.setDebugAll(true);
+
+		minusHair.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int minusHair) {
+				if (hairChoice > 0) {
+					hairChoice--;
+				}
+				System.out.println("Minus");
+				hairSprite = new Sprite(tempHairs[hairChoice][0]);
+				hairImage.setDrawable(new SpriteDrawable(hairSprite));
+				return true;
+			}
+		});
+
+		plusHair.addListener(new InputListener() {
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int plusHair) {
+				if (hairChoice < tempHairs.length - 1) {
+					hairChoice++;
+				}
+				System.out.println("Plus");
+				hairSprite = new Sprite(tempHairs[hairChoice][0]);
+				hairImage.setDrawable(new SpriteDrawable(hairSprite));
+				return true;
+			}
+		});
+
+	}
+
+	public void makeFeatsSetup() {
+		stage.dispose();
+
+		stage = new Stage();
+		currentPage = Process.makeFeats;
 		tempFeatManager = new FeatManager(tempPlayer);
+		currentFeat = tempFeatManager.getFeatList().get(0);
 		Gdx.input.setInputProcessor(stage);
 		mainTable = new Table(skin);
 		stage.addActor(mainTable);
@@ -405,7 +655,7 @@ public class CharacterCreationState implements ApplicationListener {
 					Image newImage = new Image(new Texture(f.getImg()));
 					featImage = newImage;
 					featDescription.setText(f.getDescription());
-
+					currentFeat = f;
 					return true;
 				}
 			});
@@ -453,6 +703,11 @@ public class CharacterCreationState implements ApplicationListener {
 				.height(Gdx.graphics.getHeight() / 10).expandX().colspan(2)
 				.row();
 		mainTable.add(featDescription).expand().fill().colspan(2).row();
+
+		tb = new TextButton("Next", skin);
+		mainTable.add(tb).expand().bottom().right();
+
+		defineNextButton(tb);
 
 		stage.setDebugAll(true);
 
@@ -509,6 +764,7 @@ public class CharacterCreationState implements ApplicationListener {
 		stage.dispose();
 
 		stage = new Stage();
+		currentPage = Process.makeStats;
 		Gdx.input.setInputProcessor(stage);
 		mainTable = new Table(skin);
 		stage.addActor(mainTable);
@@ -579,7 +835,6 @@ public class CharacterCreationState implements ApplicationListener {
 
 		defineNextButton(tb);
 
-		currentPage = Process.makeStats;
 		mainTable.setDebug(true);
 
 	}

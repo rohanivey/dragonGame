@@ -8,7 +8,10 @@ import com.badlogic.gdx.math.Rectangle;
 public class PlatformPlayer extends Player {
 
 	private int jumpCount;
+	private float jumpCooldown = 0.1f;
 	private float vertVelocity = -0.8f;
+	private float horVelocity = 0f;
+	private float friction = 1f;
 	private floorState fs = floorState.inAir;
 
 	enum floorState {
@@ -32,12 +35,14 @@ public class PlatformPlayer extends Player {
 
 		switch (fs) {
 		case onGround:
+			reduceJumpCooldown();
 			break;
 		case inAir:
 			applyGravity();
 			adjustGravity();
 			break;
 		case onLadder:
+			reduceJumpCooldown();
 			break;
 		}
 
@@ -50,6 +55,10 @@ public class PlatformPlayer extends Player {
 		boundingRectangle.set(location.x - currentFrame.getRegionWidth() / 4,
 				location.y, currentFrame.getRegionWidth() / 2,
 				currentFrame.getRegionHeight());
+	}
+
+	public void reduceJumpCooldown() {
+		jumpCooldown -= Gdx.graphics.getDeltaTime();
 	}
 
 	public Boolean checkLadderCollision() {
@@ -84,58 +93,91 @@ public class PlatformPlayer extends Player {
 		}
 	}
 
-	public void handleMoving() {
+	enum Direction {
+		Left, Right
+	}
+
+	public void applySpeed(Direction inputDirection) {
+		// I KNOW IT AIN'T PHYSICS KOSHER
+		switch (inputDirection) {
+		case Left:
+			if (horVelocity > speed * -4) {
+				horVelocity -= speed / 2;
+			}
+			break;
+		case Right:
+			if (horVelocity < speed * 4) {
+				horVelocity += speed / 2;
+			}
+			break;
+		}
+	}
+
+	public void applyFriction() {
+		if (horVelocity > friction && horVelocity > 0) {
+			horVelocity -= friction;
+		} else if (horVelocity < 0) {
+			horVelocity += friction;
+		} else if (horVelocity <= friction) {
+			horVelocity = 0;
+		}
+	}
+
+	public void moveDirection(Direction inputDirection) {
+		switch (inputDirection) {
+		case Left:
+			applySpeed(inputDirection);
+			break;
+		case Right:
+			applySpeed(inputDirection);
+			break;
+		}
+
+	}
+
+	public Boolean checkColliders() {
 		Rectangle tempCollision = new Rectangle();
 		Boolean canMove = true;
+
+		for (Entity e : level.getCritters()) {
+			tempCollision = new Rectangle(this.getCollision().x + horVelocity,
+					this.getCollision().y, this.getCollision().width,
+					this.getCollision().height);
+			if (Intersector.overlaps(tempCollision, e.getCollision())) {
+				canMove = false;
+				e.handleCollision(this);
+				return canMove;
+			}
+		}
+		for (Rectangle r : level.getColliders()) {
+			tempCollision = new Rectangle(this.getCollision().x + horVelocity,
+					this.getCollision().y, this.getCollision().width,
+					this.getCollision().height);
+			if (Intersector.overlaps(tempCollision, r)) {
+				canMove = false;
+				return canMove;
+			}
+		}
+		return canMove;
+	}
+
+	public void handleMoving() {
+
 		if (Gdx.input.isKeyPressed(Keys.A)) {
 
 			animationState = AnimationState.Left;
 			handleAnimation();
-			for (Entity e : level.getCritters()) {
-				tempCollision = new Rectangle(this.getCollision().x - speed,
-						this.getCollision().y, this.getCollision().width,
-						this.getCollision().height);
-				if (Intersector.overlaps(tempCollision, e.getCollision())) {
-					canMove = false;
-					e.handleCollision(this);
-				}
-			}
-			for (Rectangle r : level.getColliders()) {
-				tempCollision = new Rectangle(this.getCollision().x - speed,
-						this.getCollision().y, this.getCollision().width,
-						this.getCollision().height);
-				if (Intersector.overlaps(tempCollision, r)) {
-					canMove = false;
-				}
-			}
-			if (canMove) {
-				location.x -= speed;
-			}
-
+			moveDirection(Direction.Left);
 		} else if (Gdx.input.isKeyPressed(Keys.D)) {
 
 			animationState = AnimationState.Right;
+			applySpeed(Direction.Right);
 			handleAnimation();
-			for (Entity e : level.getCritters()) {
-				tempCollision = new Rectangle(this.getCollision().x + speed,
-						this.getCollision().y, this.getCollision().width,
-						this.getCollision().height);
-				if (Intersector.overlaps(tempCollision, e.getCollision())) {
-					canMove = false;
-					e.handleCollision(this);
-				}
-			}
-			for (Rectangle r : level.getColliders()) {
-				tempCollision = new Rectangle(this.getCollision().x + speed,
-						this.getCollision().y, this.getCollision().width,
-						this.getCollision().height);
-				if (Intersector.overlaps(tempCollision, r)) {
-					canMove = false;
-				}
-			}
-			if (canMove) {
-				location.x += speed;
-			}
+		} else {
+			applyFriction();
+		}
+		if (checkColliders()) {
+			location.x += horVelocity;
 		}
 
 		if (Gdx.input.isKeyPressed(Keys.W)) {
@@ -154,7 +196,9 @@ public class PlatformPlayer extends Player {
 
 		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
 			if (fs == floorState.onGround || fs == floorState.onLadder) {
-				jump();
+				if (jumpCooldown < 0) {
+					jump();
+				}
 			}
 		}
 
@@ -264,7 +308,8 @@ public class PlatformPlayer extends Player {
 
 	public void jump() {
 		fs = floorState.inAir;
-		this.vertVelocity = agility + 10f;
+		vertVelocity = agility + 10f;
+		jumpCooldown = 0.1f;
 	}
 
 }

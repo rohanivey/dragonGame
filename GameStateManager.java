@@ -64,7 +64,9 @@ public class GameStateManager {
 
 			case CharacterCreation:
 				if (characterCreation.stateChange()) {
-					String tempString = menu.getState();
+					System.out
+							.println("GameStateManager sees the change in characterCreation");
+					String tempString = characterCreation.getState();
 					changeState(tempString);
 				} else {
 					// Due to buffering/clearing, don't update here since render
@@ -113,6 +115,7 @@ public class GameStateManager {
 			break;
 		case "Play":
 			currentState = State.Play;
+			System.out.println("Setting current state to play");
 			break;
 		case "Options":
 			currentState = State.OptionsMenu;

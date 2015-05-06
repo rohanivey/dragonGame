@@ -47,6 +47,7 @@ public class Player {
 	State currentState = State.Moving;
 	protected float stateTime;
 	TextureRegion[] animationFrames;
+	TextureRegion[] animationFrames2;
 	TextureRegion currentFrame;
 
 	// Horizontal
@@ -97,13 +98,18 @@ public class Player {
 		img = new Texture("animations/player.png");
 		TextureRegion[][] tempFrames = TextureRegion.split(img, img.getWidth()
 				/ FRAME_COLS, img.getHeight() / FRAME_ROWS);
-		// animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-		// int index = 0;
+		TextureRegion[][] tempFrames2 = TextureRegion.split(new Texture(
+				"animations/ro2.png"), 32, 64);
 		for (int i = 0; i < FRAME_ROWS; i++) {
 			animationFrames = new TextureRegion[FRAME_COLS];
 			int index = 0;
 			for (int j = 0; j < FRAME_COLS; j++) {
 				animationFrames[index++] = tempFrames[i][j];
+			}
+			animationFrames2 = new TextureRegion[30];
+			for (int n = 0; n < 30; n++) {
+
+				animationFrames2[n] = tempFrames2[n][0];
 			}
 			switch (i) {
 			case 0:
@@ -113,7 +119,8 @@ public class Player {
 				walkLeft = new Animation(1f / 9f, animationFrames);
 				break;
 			case 2:
-				walkDown = new Animation(1f / 9f, animationFrames);
+				// walkDown = new Animation(1f / 9f, animationFrames);
+				walkDown = new Animation(1f / 30f, animationFrames2);
 				break;
 			case 3:
 				walkRight = new Animation(1f / 9f, animationFrames);
@@ -304,7 +311,7 @@ public class Player {
 		writer.element("Player").element("Stats").element("Strength").text(str)
 				.pop().element("Intelligence").text(intel).pop()
 				.element("Wisdom").text(wis).pop().element("Agility")
-				.text(agility).pop().pop();
+				.text(agility).pop().element("Vitality").text(vit).pop().pop();
 		System.out.println(sw);
 	}
 
